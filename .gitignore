@@ -1,0 +1,18 @@
+# Eclipse
+.metadata/
+.settings/
+.classpath
+.project
+build/
+
+# Java
+target/
+bin/
+test/
+
+# Tomcat upload (중요)
+resources/upload/
+
+# OS
+.DS_Store
+Thumbs.db

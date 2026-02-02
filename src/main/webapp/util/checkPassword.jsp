@@ -1,0 +1,135 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+    String href = request.getParameter("next");
+%>
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>비밀번호 확인</title>
+
+<link rel="stylesheet" href="/summat/resources/css/style.css">
+
+<style>
+.password-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f3ef;
+}
+
+.password-card {
+    background: #fff;
+    width: 360px;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.password-card h2 {
+    margin-bottom: 8px;
+    font-size: 20px;
+}
+
+.password-card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.password-card input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 16px;
+     box-sizing: border-box;
+}
+
+.password-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.password-actions button {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.password-actions .confirm {
+    background: #ff8a00;
+    color: #fff;
+}
+
+.password-actions .cancel {
+    background: #e0e0e0;
+    color: #333;
+}
+</style>
+</head>
+
+<body>
+<div class="password-wrap">
+    <div class="password-card">
+        <h2>비밀번호 확인</h2>
+        <p>이 작업을 진행하려면 비밀번호를 입력하세요.</p>
+
+        <input type="password" id="password" placeholder="비밀번호 입력" autofocus>
+
+        <div class="password-actions">
+            <button class="confirm" type="button" onclick="checkPassword()">확인</button>
+            <button class="cancel" type="button" onclick="history.back()">취소</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function checkPassword() {
+    const pw = document.getElementById("password").value;
+    if (!pw) {
+        alert("비밀번호를 입력하세요.");
+        return;
+    }
+    // 기존 로직 연결
+}
+</script>
+
+</body>
+</html>
+
+
+<script>
+function checkPassword() {
+    const password = document.getElementById("password").value;
+
+    fetch("/summat/util/checkPasswordPro.jsp", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            password: password
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 히스토리 안 쌓이게 replace 사용
+            const url = new URL("<%=href%>", window.location.origin);
+			url.searchParams.set("checkAuthenticated", "true");
+			location.replace(url);
+        } else {
+            alert("비밀번호를 확인해 주세요.");
+        }
+    });
+}
+</script>

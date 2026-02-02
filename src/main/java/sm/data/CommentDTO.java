@@ -1,0 +1,26 @@
+package sm.data;
+
+import java.util.Date;
+
+public class CommentDTO {
+    private int id;
+    private int boardNum;
+    private String writer;
+    private String content;
+    private Date regDate;
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public int getBoardNum() { return boardNum; }
+    public void setBoardNum(int boardNum) { this.boardNum = boardNum; }
+
+    public String getWriter() { return writer; }
+    public void setWriter(String writer) { this.writer = writer; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public Date getRegDate() { return regDate; }
+    public void setRegDate(Date regDate) { this.regDate = regDate; }
+}

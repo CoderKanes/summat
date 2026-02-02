@@ -1,0 +1,301 @@
+package sm.data;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PostDAO {
+	private Connection conn;
+	private PreparedStatement pstmt;
+	private ResultSet rs;
+
+	public int GetPostSeqNextVal() {
+		int result = 0;
+		try {
+			conn = OracleConnection.getConnection();
+
+			String sql = "select post_seq.nextval from dual";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				result = rs.getInt(1);
+			} else {
+				throw new Exception();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+
+	public boolean insertPost(PostDTO dto) {
+		boolean result = true;
+
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "insert into post (postNum, user_id, title, content, thumbnailImage) values(post_seq.nextval,?,?,?,?)";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getUser_id());
+			pstmt.setString(2, dto.getTitle());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setString(4, dto.getThumbnailImage());
+
+			result = pstmt.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			result = false;
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+
+	public boolean updatePost(PostDTO dto) {
+		boolean result = true;
+
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "update post set user_id=?, title=?, content=?, thumbnailImage=? where postNum=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getUser_id());
+			pstmt.setString(2, dto.getTitle());
+			pstmt.setString(3, dto.getContent());
+			pstmt.setString(4, dto.getThumbnailImage());
+			pstmt.setInt(5, dto.getPostNum());
+
+			result = pstmt.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			result = false;
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+
+	public boolean deletePost(int postNum) {
+		boolean result = true;
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "delete from post where postNum=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, postNum);
+
+			result = pstmt.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			result = false;
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	public int getPostListCount(PostQueryCondition condition) {
+		int result = 0;
+
+		try {
+			conn = OracleConnection.getConnection();
+
+			List<QueryParam> params = new ArrayList<>();
+
+			String sql = " select count(*) from post where 1=1 ";
+			sql = AppendSearchQuery(sql, condition, params);
+			sql = AppendFilterQuery(sql, condition, params);
+			sql = AppendOrderQuery(sql, condition, params);
+		
+			pstmt = conn.prepareStatement(sql);
+			for (int i = 0; i < params.size(); i++) {
+				QueryParam param = params.get(i);
+				if (param.value == null) {
+					pstmt.setNull(i + 1, param.type);
+				} else {
+					pstmt.setObject(i + 1, param.value, param.type);					
+				}
+			}
+						
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				result = rs.getInt(1);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	
+	public List<PostDTO> selectPostList(int start, int end, PostQueryCondition condition) {
+		List<PostDTO> result = null;
+
+		try {
+			conn = OracleConnection.getConnection();
+
+			List<QueryParam> params = new ArrayList<>();
+
+			String baseSql = " select * from post where 1=1 ";
+			baseSql = AppendSearchQuery(baseSql, condition, params);
+			baseSql = AppendFilterQuery(baseSql, condition, params);
+			baseSql = AppendOrderQuery(baseSql, condition, params);
+
+			String rownumTable = "select a.*, rownum r from (" + baseSql + ") a ";
+			String sql = start == end ? "select * from (" + rownumTable + ") "
+					: "select * from (" + rownumTable + ") where r between ? and ?";
+			if (start != end) {
+				params.add(new QueryParam(start, Types.INTEGER));
+				params.add(new QueryParam(end, Types.INTEGER));				
+			}
+			
+			String paramDebugString = "";
+			pstmt = conn.prepareStatement(sql);
+			for (int i = 0; i < params.size(); i++) {
+				QueryParam param = params.get(i);
+				if (param.value == null) {
+					pstmt.setNull(i + 1, param.type);
+					paramDebugString+= "["+(i+1)+"]null";
+				} else {
+					pstmt.setObject(i + 1, param.value, param.type);
+					paramDebugString+= "["+(i+1)+"]"+param.value;
+				}
+			}
+						
+			System.out.println(sql + ":" +paramDebugString );
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				result = new ArrayList<PostDTO>();
+				do {
+					PostDTO postDto = new PostDTO();
+					postDto.setPostNum(rs.getInt("postNum"));
+					postDto.setUser_id(rs.getString("user_id"));
+					postDto.setTitle(rs.getString("title"));
+					postDto.setContent(rs.getString("content"));
+					postDto.setThumbnailImage(rs.getString("thumbnailImage"));
+					postDto.setViewCount(rs.getInt("viewCount"));
+					postDto.setLikeCount(rs.getInt("likeCount"));
+					postDto.setCreated_at(rs.getTimestamp("created_at"));
+					postDto.setUpdated_at(rs.getTimestamp("updated_at"));
+					result.add(postDto);
+				} while (rs.next());
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+
+	public String AppendSearchQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
+
+		if (condition != null && condition.getKeyword() != null && !condition.getKeyword().isEmpty()) {
+			PostQueryCondition.SearchType type = condition.getSearchType() == null ? PostQueryCondition.SearchType.ALL : condition.getSearchType();
+
+			switch (type) {
+			case TITLE:
+				baseSql += " and title like ? ";
+				params.add(new QueryParam("%" + condition.getKeyword() + "%", Types.VARCHAR));
+				break;
+			case CONTENT:
+				baseSql += " and content like ? ";
+				params.add(new QueryParam("%" + condition.getKeyword() + "%", Types.VARCHAR));
+				break;
+			case ALL:
+				baseSql += " and (title like ? or content like ?) ";
+				params.add(new QueryParam("%" + condition.getKeyword() + "%", Types.VARCHAR));
+				params.add(new QueryParam("%" + condition.getKeyword() + "%", Types.VARCHAR));
+				break;
+			}
+		}
+		return baseSql;
+	}
+
+	public String AppendFilterQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
+		if(condition != null) {		
+			if (condition.getMinViewCount() != null) {
+				baseSql += " and viewCount >= ? ";
+				params.add(new QueryParam(condition.getMinViewCount(), Types.INTEGER));
+			}
+	
+			if (condition.getMinLikeCount() != null) {
+				baseSql += " and likeCount >= ? ";
+				params.add(new QueryParam(condition.getMinLikeCount(), Types.INTEGER));
+			}
+		}
+
+		return baseSql;
+	}
+
+	public String AppendOrderQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
+		if (condition != null) {
+			PostQueryCondition.OrderType orderType = condition.getOrderType() == null ? PostQueryCondition.OrderType.LATEST : condition.getOrderType();
+
+			switch (orderType) {
+			case PostQueryCondition.OrderType.VIEW:
+				baseSql += " order by viewCount desc ";
+				break;
+			case PostQueryCondition.OrderType.LIKE:
+				baseSql += " order by likeCount desc ";
+				break;
+			default:
+				baseSql += " order by created_at desc ";
+			}
+		}
+		return baseSql;
+	}
+
+	public PostDTO selectPost(int postNum) {
+		PostDTO result = null;
+
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "select * from post where postNum=?";
+
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, postNum);
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				result = new PostDTO();
+				result.setPostNum(rs.getInt("postNum"));
+				result.setUser_id(rs.getString("user_id"));
+				result.setTitle(rs.getString("title"));
+				result.setContent(rs.getString("content"));
+				result.setThumbnailImage(rs.getString("thumbnailImage"));
+				result.setViewCount(rs.getInt("viewCount"));
+				result.setLikeCount(rs.getInt("likeCount"));
+				result.setCreated_at(rs.getTimestamp("created_at"));
+				result.setUpdated_at(rs.getTimestamp("updated_at"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+
+	private static class QueryParam {
+		Object value;
+		int type; // java.sql.Types.INTEGER java.sql.Types.DOUBLE java.sql.Types.VARCHAR
+					// java.sql.Types.TIMESTAMP
+
+		QueryParam(Object value, int type) {
+			this.value = value;
+			this.type = type;
+		}
+	}
+}
