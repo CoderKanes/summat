@@ -1,33 +1,33 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<html lang="ko">
 <head>
 	<title>맛집 페이지 테마 샘플</title>
 	<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
-<% 	
-	
-	//로그인 여부 
-	boolean isLogin = (session.getAttribute("sid") != null);
-	//null 체그
-	int grade = 1;
-	
-	if(session.getAttribute("grade") != null){
-		grade = (Integer)session.getAttribute("grade");
-	}
-
-	//grade 저장
-	/*
-	int grade = 1;
-	
-	Object gradeObj = session.getAttribute("grade");
-	if (gradeObj instanceof Integer) {
-		grade = (Integer) gradeObj;
-		// 필요시 0/1 이외의 값도 기본값으로 보정
-		if (grade != 0 && grade != 1) {
-		    grade = 1;
-		}
-	}
-	*/
+	<%        
+        
+        //로그인 여부
+        boolean isLogin = (session.getAttribute("sid") != null);
+        //null 체그
+        int grade = 1;
+        
+        if(session.getAttribute("grade") != null){
+                grade = (Integer)session.getAttribute("grade");
+        }
+        //grade 저장
+        /*
+        int grade = 1;
+        
+        Object gradeObj = session.getAttribute("grade");
+        if (gradeObj instanceof Integer) {
+                grade = (Integer) gradeObj;
+                // 필요시 0/1 이외의 값도 기본값으로 보정
+                if (grade != 0 && grade != 1) {
+                    grade = 1;
+                }
+        }
+        */
 %>
 </head>
 
@@ -50,18 +50,17 @@
 			<button class="theme-btn" onclick="login()">로그인</button>  
 			<% } %> 
 	</header>
+	<nav class="top-nav">
+		<ul>
+			<li class="active">홈</li>
+			<li>음식정보</li>
+			<a href="/summat/post/postMain.jsp" style="text-decoration: none;"><li>포스트</li></a>
+			<a href="/summat/sm/board/list.jsp" style="text-decoration: none;"><li>커뮤니티</li></a>
+		</ul>
+	</nav>
 
 	<div class="container">
-		<aside>
-			<h3>사이드 메뉴</h3>
-			<p>카테고리</p>
-			<p>지역</p>
-			<p>가격대</p>
 
-			<!-- 사이드 글쓰기 -->
-			<div class="side-write" onclick="writePost()">✍ 리뷰 쓰기</div>
-			
-		</aside>
 
 		<main id="mainContent">
 			<div class="filter">필터링 및 카테고리 숏컷</div>
@@ -78,24 +77,9 @@
 			
 			<!-- 리스트 -->
 			<h2>최신 포스트</h2>
-			<% for(int i = 0 ; i < 10; ++i) { %>
-			<div class="card">
-				<div class="image-box">
-				<img src="/summat/resources/image/image00.jfif">
-				</div>
-
-				<div class="text-box">
-					<h3>글 제목이 들어감</h3>
-					<p>
-						글 내용이 들어감 oooooooooooooooooooooooooo<br>
-						ooooooooooooooooooooooooooooooooooooooooooo<br>
-						ooooooooooooooooooooooooooooooooooooooooooo
-					</p>
-				</div>
-			</div>
+			<jsp:include page="/post/postList.jsp" />	 
 			<br />
-			<br />
-			<% } %>
+		
 		</main>
 	</div>
 
