@@ -133,4 +133,46 @@ public class AdminDAO {
 		return count;
 	}//getAllcount end
 	
+	public boolean adminDeactivated(String user_id, String user_status) {
+		boolean result = false;
+		try {
+			conn = OracleConnection.getConnection();
+			sql = "update members set user_status = ?, updated_at = current_date where user_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, user_status);
+			pstmt.setString(2, user_id);
+			
+			int update = pstmt.executeUpdate();
+			
+			if(update > 0) {
+				result = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}//Deactivated end
+	
+	public int setGrade(String user_id, int grade) {
+		int result = 0;
+		try {
+			conn = OracleConnection.getConnection();
+			sql = "update members set grade = ? where user_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, grade);
+			pstmt.setString(2, user_id);
+			
+			//result  = 1 or 0
+			result = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		
+		return result;
+	}
+	
 }//AdminDAO end

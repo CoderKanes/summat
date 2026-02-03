@@ -4,6 +4,31 @@
 <head>
 	<title>맛집 페이지 테마 샘플</title>
 	<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
+<% 	
+	
+	//로그인 여부 
+	boolean isLogin = (session.getAttribute("sid") != null);
+	//null 체그
+	int grade = 1;
+	
+	if(session.getAttribute("grade") != null){
+		grade = (Integer)session.getAttribute("grade");
+	}
+
+	//grade 저장
+	/*
+	int grade = 1;
+	
+	Object gradeObj = session.getAttribute("grade");
+	if (gradeObj instanceof Integer) {
+		grade = (Integer) gradeObj;
+		// 필요시 0/1 이외의 값도 기본값으로 보정
+		if (grade != 0 && grade != 1) {
+		    grade = 1;
+		}
+	}
+	*/
+%>
 </head>
 
 <body>
@@ -13,8 +38,17 @@
 
 		<!-- 헤더 글쓰기 -->
 		<button class="icon-btn" onclick="writePost()">✏️</button>
-		<button class="theme-btn" onclick="login()">로그인</button>
-		<!-- <button class="theme-btn" onclick="changeTheme()">테마변경</button> -->
+		<!-- 로그인 여부에 따라 버튼 변경 -->
+		<% if (isLogin) { %>  
+			<% if (grade == 0) { %>  
+				<button class="theme-btn" onclick="location.href='/summat/admin/memberList.jsp'">회원 관리</button>  
+			<% } else if (grade == 1) { %>  
+				<button class="theme-btn" onclick="location.href='/summat/user/mypage.jsp'">마이페이지</button>  
+			<% } %>  
+			<button class="theme-btn" onclick="location.href='/summat/user/logoutPro.jsp'">로그아웃</button>  
+		<% } else { %>  
+			<button class="theme-btn" onclick="login()">로그인</button>  
+			<% } %> 
 	</header>
 
 	<div class="container">
@@ -26,6 +60,7 @@
 
 			<!-- 사이드 글쓰기 -->
 			<div class="side-write" onclick="writePost()">✍ 리뷰 쓰기</div>
+			
 		</aside>
 
 		<main id="mainContent">
@@ -93,7 +128,7 @@ function writePost() {
   alert("리뷰 작성 페이지로 이동 (임시)");
 }
 function login() {
-  alert("로그인 페이지로 이동 (임시)");
+  location.href="/summat/user/loginForm.jsp";
 }
 
 /* ===== FLOATING BUTTON LOGIC ===== */

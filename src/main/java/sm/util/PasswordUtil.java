@@ -34,7 +34,7 @@ public class PasswordUtil {
 			SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 			byte[] hash = skf.generateSecret(space).getEncoded();
 			return Base64.getEncoder().encodeToString(hash);
-		} catch (Exception e) {
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			throw new RuntimeException("Password hashing failed", e);
 		}
 	
