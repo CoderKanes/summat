@@ -157,7 +157,7 @@
 			
 			  	<div>
 			    	<label for="password">비밀번호</label>
-			    	<input type="password" id="password" name="password_hash" required placeholder="비밀번호" />
+			    	<input type="password" id="password" name="password" required placeholder="비밀번호" />
 			  	</div>
 			
 			  	<div>

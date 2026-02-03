@@ -6,14 +6,13 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.management.RuntimeErrorException;
 
 public class PasswordUtil {
 	//16바이트 솔트
 	private static final int SALT_LEN = 16;
 	//65536번 반복
 	private static final int ITERATION = 65536;
-	//최종 256바이트 키 생성
+	//최종 256비트 키 생성
 	private static final int KEY_LEN = 256;
 	
 	//16 바이트 솔트 생성 및 Base64로 인코딩 된 문자열 번호

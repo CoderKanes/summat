@@ -28,7 +28,7 @@ public class MemberDAO {
 	public void insert(MemberDTO dto) {
 		try {
 			conn = OracleConnection.getConnection();
-			sql = "insert into members (user_id, username, email, phone, address, resident_registration_number, password_hash, created_at) values(?, ?, ?, ?, ?, ?, ?, ?)";
+			sql = "insert into members (user_id, username, email, phone, address, resident_registration_number, password_hash, password_salt, created_at) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, dto.getUser_id());
 			pstmt.setString(2, dto.getUsername());
@@ -37,7 +37,8 @@ public class MemberDAO {
 			pstmt.setString(5, dto.getAddress());
 			pstmt.setString(6, dto.getResident_registration_number());
 			pstmt.setString(7, dto.getPassword_Hash());
-			pstmt.setTimestamp(8, dto.getCreated_at());
+			pstmt.setString(8, dto.getPassword_salt());
+			pstmt.setTimestamp(9, dto.getCreated_at());
 			
 			pstmt.executeUpdate();
 			
