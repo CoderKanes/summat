@@ -73,7 +73,7 @@
 			</div>
 
 
-			<div class="banner">뭔가 뭔가 배너</div>
+			<div class="banner">뭔가뭔가 배너...</div>
 
 			
 			<!-- 리스트 -->
