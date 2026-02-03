@@ -45,7 +45,7 @@ echo [2/4] 서버 업데이트 가져오기 (Pull)...
 git pull
 if %errorlevel% neq 0 (
     echo.
-    echo !!!!!!!! 경고: 충돌(Conflict)이 발생했습니다 !!!!!!!!
+    echo !!!!!!!! 경고: 충돌Conflict 이 발생했습니다 !!!!!!!!
     pause
     exit /b
 )
