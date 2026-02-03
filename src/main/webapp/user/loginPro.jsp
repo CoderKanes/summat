@@ -13,6 +13,7 @@
 <body>
 		
 <%
+	//이렇게 수정하면 바로 반영이 되야되는데....
 	MemberDTO dto = new MemberDTO();
 	
 	String user_id = request.getParameter("user_id");
