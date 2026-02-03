@@ -1,4 +1,6 @@
 @echo off
+cd /d %~dp0
+
 setlocal
 set CUR_DATE=%date%
 set CUR_TIME=%time:~0,5%
