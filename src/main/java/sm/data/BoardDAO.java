@@ -14,11 +14,11 @@ public class BoardDAO {
 	public BoardDAO() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@192.168.219.198:1521:orcl", "dev04", "1234");
-
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@192.168.219.198:1521:orcl", "Web1", "1234");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	// 게시글 목록
@@ -46,27 +46,29 @@ public class BoardDAO {
 		}
 		return list;
 	}
-	
+
 // 게시글 등록   
 // ----------------------------------------------------------------------
 	public void insert(BoardDTO dto) {
-	    String sql = "INSERT INTO board (num, title, content, writer, regdate, hit) "
-	               + "VALUES (board_seq.NEXTVAL, ?, ?, ?, SYSDATE, 0)";
-	    	// 쿼리문 작성 물음표 값에 dto 값을 대입 한다 
-	    try {
-	        PreparedStatement ps = conn.prepareStatement(sql);
-	        ps.setString(1, dto.getTitle());
-	        ps.setString(2, dto.getContent());
-	        ps.setString(3, dto.getWriter());
-	        ps.executeUpdate();
+		String sql = "INSERT INTO board (id, num, title, content, writer, regdate, hit) "
+				+ "VALUES (?,board_seq.NEXTVAL, ?, ?, ?, SYSDATE, 0)";
+		// 쿼리문 작성 물음표 값에 dto 값을 대입 한다
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, dto.getId());
+			ps.setString(2, dto.getTitle());
+			ps.setString(3, dto.getContent());
+			ps.setString(4, dto.getWriter());
+			ps.executeUpdate();
 
-	        System.out.println(">>> 게시글 등록 성공");
+			System.out.println(">>> 게시글 등록 성공");
 
-	    } catch (Exception e) {
-	        System.out.println(">>> 게시글 등록 실패");
-	        e.printStackTrace();
-	    }
+		} catch (Exception e) {
+			System.out.println(">>> 게시글 등록 실패");
+			e.printStackTrace();
+		}
 	}
+
 // ----------------------------------------------------------------------	
 	public void save(BoardDTO dto) {
 
@@ -88,6 +90,7 @@ public class BoardDAO {
 		}
 	}
 
+	// ----------- 게시글 번호
 	public BoardDTO getBoardByNum(int num) {
 		BoardDTO board = null;
 		PreparedStatement ps = null;
@@ -125,10 +128,12 @@ public class BoardDAO {
 	}
 
 	public List<BoardDTO> getAllBoards() {
+
 		List<BoardDTO> list = new ArrayList<>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String sql = "SELECT num, title, content, writer, regDate, hit FROM board ORDER BY num DESC";
+
+		String sql = "SELECT num, title, content, writer, regdate, hit " + "FROM board ORDER BY num DESC"; // ← 테이블명 확인!
 
 		try {
 			ps = conn.prepareStatement(sql);
@@ -140,7 +145,7 @@ public class BoardDAO {
 				board.setTitle(rs.getString("title"));
 				board.setContent(rs.getString("content"));
 				board.setWriter(rs.getString("writer"));
-				board.setRegDate(rs.getTimestamp("regDate").toString());
+				board.setRegDate(rs.getString("regdate")); // ⭐ 변경
 				board.setHit(rs.getInt("hit"));
 				list.add(board);
 			}
@@ -166,9 +171,9 @@ public class BoardDAO {
 		private Connection conn;
 
 		public CommentDAO() throws Exception {
-			String url = "jdbc:oracle:thin:@localhost:1521:xe"; // Oracle 연결
-			String user = "yourUser";
-			String password = "yourPassword";
+			String url = "jdbc:oracle:thin:@l192.168.219.198:1521:xe"; // Oracle 연결
+			String user = "Web1";
+			String password = "1234";
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			conn = DriverManager.getConnection(url, user, password);
 		}
@@ -219,7 +224,7 @@ public class BoardDAO {
 			}
 		}
 	}
-
+	// 조횟수 증가 
 	public void increaseHit(int num) {
 		String sql = "UPDATE board SET hit = hit + 1 WHERE num = ?";
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -229,8 +234,7 @@ public class BoardDAO {
 			e.printStackTrace();
 		}
 	}
-	
-
+	// 게시판 댓글 삭제 
 	public void deleteBoardAndComments(int num) {
 		try {
 			// 댓글 먼저 삭제
@@ -238,7 +242,7 @@ public class BoardDAO {
 			try (PreparedStatement ps1 = conn.prepareStatement(delComments)) {
 				ps1.setInt(1, num);
 				ps1.executeUpdate();
-			}  // post
+			} // post
 
 			// 게시글 삭제
 			String delBoard = "DELETE FROM board WHERE num = ?";
@@ -451,88 +455,111 @@ public class BoardDAO {
 
 	// 4️⃣ 글 삭제
 	public int DeletePost(int num) {
-	    int result = 0;
-	    Connection conn = null;
-	    PreparedStatement ps = null;
+		int result = 0;
+		Connection conn = null;
+		PreparedStatement ps = null;
 
-	    try {
-	        conn = getConnection();
-	        String sql = "DELETE FROM board WHERE num = ?";
-	        ps = conn.prepareStatement(sql);
-	        ps.setInt(1, num);
-	        result = ps.executeUpdate();
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        try { if(ps != null) ps.close(); } catch(Exception e) { e.printStackTrace(); }
-	        try { if(conn != null) conn.close(); } catch(Exception e) { e.printStackTrace(); }
-	    }
+		try {
+			conn = getConnection();
+			String sql = "DELETE FROM board WHERE num = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, num);
+			result = ps.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-	    return result;
-	
+		return result;
+
 	}
+
 	// 조회수 증가 (한 IP당 1회)
 	public boolean increaseHitByIP(int num, String ip) {
-	    Connection conn = null;
-	    PreparedStatement ps = null;
-	    ResultSet rs = null;
-	    boolean success = false;
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		boolean success = false;
 
-	    try {
-	        conn = OracleConnection.getConnection();
+		try {
+			conn = OracleConnection.getConnection();
 
-	        // 1️⃣ 해당 IP가 이미 조회했는지 체크
-	        String checkSql = "SELECT COUNT(*) FROM board_hit_log WHERE num=? AND ip=?";
-	        ps = conn.prepareStatement(checkSql);
-	        ps.setInt(1, num);
-	        ps.setString(2, ip);
-	        rs = ps.executeQuery();
-	        if(rs.next() && rs.getInt(1) == 0) {
-	            // 2️⃣ 조회수 증가
-	            String updateSql = "UPDATE board SET hit = hit + 1 WHERE num=?";
-	            ps = conn.prepareStatement(updateSql);
-	            ps.setInt(1, num);
-	            ps.executeUpdate();
+			// 1️⃣ 해당 IP가 이미 조회했는지 체크
+			String checkSql = "SELECT COUNT(*) FROM board_hit_log WHERE num=? AND ip=?";
+			ps = conn.prepareStatement(checkSql);
+			ps.setInt(1, num);
+			ps.setString(2, ip);
+			rs = ps.executeQuery();
+			if (rs.next() && rs.getInt(1) == 0) {
+				// 2️⃣ 조회수 증가
+				String updateSql = "UPDATE board SET hit = hit + 1 WHERE num=?";
+				ps = conn.prepareStatement(updateSql);
+				ps.setInt(1, num);
+				ps.executeUpdate();
 
-	            // 3️⃣ 히트 로그 추가
-	            String insertSql = "INSERT INTO board_hit_log(num, ip) VALUES(?, ?)";
-	            ps = conn.prepareStatement(insertSql);
-	            ps.setInt(1, num);
-	            ps.setString(2, ip);
-	            ps.executeUpdate();
+				// 3️⃣ 히트 로그 추가
+				String insertSql = "INSERT INTO board_hit_log(num, ip) VALUES(?, ?)";
+				ps = conn.prepareStatement(insertSql);
+				ps.setInt(1, num);
+				ps.setString(2, ip);
+				ps.executeUpdate();
 
-	            success = true;
-	        }
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        try { if(rs != null) rs.close(); } catch(Exception e) {}
-	        try { if(ps != null) ps.close(); } catch(Exception e) {}
-	        try { if(conn != null) conn.close(); } catch(Exception e) {}
-	    }
+				success = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception e) {
+			}
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (Exception e) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+			}
+		}
 
-	    return success;
+		return success;
 	}
-	
-	// 리스트 화면에서 게시글 삭제 
+
+	// 리스트 화면에서 게시글 삭제
 	public void delete(int num) {
-	    Connection conn = null;
-	    PreparedStatement ps = null;
+		Connection conn = null;
+		PreparedStatement ps = null;
 
-	    try {
-	        conn = getConnection();
+		try {
+			conn = getConnection();
 
-	        String sql = "DELETE FROM board WHERE num = ?";
-	        ps = conn.prepareStatement(sql);
-	        ps.setInt(1, num);
+			String sql = "DELETE FROM board WHERE num = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, num);
 
-	        ps.executeUpdate();
+			ps.executeUpdate();
 
-	        System.out.println("게시글 삭제 성공 : num = " + num);
+			System.out.println("게시글 삭제 성공 : num = " + num);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	   
-	    }
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
 	}
 }
