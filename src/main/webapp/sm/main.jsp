@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+<%--
+    작성자 : 김용진
+    내용 : 메인페이지. 기본적인 진입방식으로 접근했을때 가장 처음 보여줄 페이지.
+--%>
+	
 <!DOCTYPE html>
 <html lang="ko">
 <head>

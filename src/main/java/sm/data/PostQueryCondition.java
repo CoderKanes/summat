@@ -3,7 +3,10 @@ package sm.data;
 import java.util.List;
 
 
-
+/*
+ * 작성자 : 김용진
+ * 내용 : PostDAO에서 검색,필터,정렬 관련 Param으로 사용하기 위한 DataType Class
+ */
 public class PostQueryCondition {
 	public enum SearchType {
 	    ALL,

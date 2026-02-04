@@ -1,11 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-
+    
 <%@ page import="sm.data.PostDAO" %>
 <%@ page import="sm.data.PostDTO" %>
 <%@ page import="sm.util.HTMLUtil" %>
 <%@ page import="sm.data.PostQueryCondition" %>
 <%@ page import="java.util.List" %>
+
+<%--
+    작성자 : 김용진
+    내용 : PostList를 얻어와 출력하는 페이지. 
+    	paging 값이나 검색관련 param이 있으면 그에 맞게 list를 구성
+--%>
 
 <link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
 

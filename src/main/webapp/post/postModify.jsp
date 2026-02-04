@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
+<%--
+    작성자 : 김용진
+    내용 : 작성한 Post 수정페이지.
+--%>
+
 <link href="/summat/resources/css/style.css" rel="stylesheet" />
 <link href="/summat/resources/css/post/postEdit.css" rel="stylesheet" />
 
