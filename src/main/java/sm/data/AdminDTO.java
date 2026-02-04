@@ -11,15 +11,15 @@ public class AdminDTO {
 	private String resident_registration_number;
 	private String password_hash;
 	private String password_salt;
-	private String user_status;
+	private String user_status; //ACTIVE 정상, DEACTIVE 탈퇴, STOPPED 정지
 	private int email_verified;
 	private int phone_verified;
 	private String profile_image_url;
 	private Timestamp created_at;
-	private Timestamp updated_at;
-	private Timestamp last_login_at;
-	private Timestamp password_changed_at;
-	private int grade;
+	private Timestamp updated_at; //회원 상태 변경 관련 변수
+	private Timestamp last_login_at; //회원 정지 상태 회복 및 데이터 삭제를 위한 변수
+	private Timestamp password_changed_at; //일정 시간 후 비번 변경을 위한 변수
+	private int grade; // 0 관리자, 1 일반 회원, 2 인플루언서, 3 기자
 	public String getUser_id() {
 		return user_id;
 	}

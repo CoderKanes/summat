@@ -1,4 +1,5 @@
 
+<%@page import="java.util.UUID"%>
 <%@page import="sm.data.MemberDTO"%>
 <%@page import="sm.data.MemberDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -41,6 +42,31 @@
 	if(result){
 		//아이디 저장
 		session.setAttribute("sid", dto.getUser_id());
+		//인증여부
+		session.setAttribute("authenticated", true);
+		//시간 30분
+		session.setMaxInactiveInterval(30 * 60);
+		
+		//쿠키 처리
+		//체크박스 체그확인
+		String remember = request.getParameter("rememberMe");
+		if("on".equals(remember)){
+			//토큰생성
+			//				id + 랜덤 글자 Ex) java|fjdiao1341234ji의 형태
+			String token = dto.getUser_id() + "|" + UUID.randomUUID().toString();
+			//쿠킹에 토큰 저장
+			Cookie rememberCookie = new Cookie("rememberMe", token);
+			//리멤버 쿠키 모든 브라우저에 전달
+			rememberCookie.setPath("/");
+			//7일
+			rememberCookie.setMaxAge(7 * 24 * 60 * 60);
+			//보안설정
+			rememberCookie.setHttpOnly(true);
+			//hppts일 때에만 응답
+			rememberCookie.setSecure(request.isSecure());
+			response.addCookie(rememberCookie);
+		}
+		
 		response.sendRedirect("/summat/sm/main.jsp");
 	}else{
 %>		

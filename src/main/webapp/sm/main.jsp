@@ -5,11 +5,45 @@
 <head>
 	<title>맛집 페이지 테마 샘플</title>
 	<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
+<%
+    Boolean isAuth = (session != null) ? (Boolean) session.getAttribute("authenticated") : null;
+    
+	if (isAuth == null || !isAuth) {
+        
+		// 로그인 안 되어 있으면 remember-me 쿠키를 확인하고 재생성 시도
+		Cookie[] cookies = request.getCookies();
+        
+		if (cookies != null) {
+			for (javax.servlet.http.Cookie c : cookies) {
+                if ("rememberMe".equals(c.getName())) {
+                    String token = c.getValue();
+                    String[] parts = token != null ? token.split("\\|", 2) : null;
+                    if (parts != null && parts.length == 2) {
+                        String userId = parts[0];
+                        // 서버 측에서 토큰의 유효성을 검증하는 로직이 안전하게 필요합니다.
+                        // 여기서는 간단히 userId로 세션 재생성
+                        HttpSession newSession = request.getSession(true);
+                        newSession.setAttribute("sid", userId);
+                        newSession.setAttribute("authenticated", true);
+                        newSession.setMaxInactiveInterval(30 * 60);
+                        // 재생성 후 원래 페이지로 진행
+                        break;
+                    }
+                }
+            }
+        }
+    }
+%>
+	
 	<%        
         
         //로그인 여부
-        boolean isLogin = (session.getAttribute("sid") != null);
-        //null 체그
+        boolean isLogin = (boolean)(session != null ? session.getAttribute("authenticated") : null);
+        
+		if(isAuth == null || !is){
+			
+		}
+		//null 체그
         int grade = 1;
         
         if(session.getAttribute("grade") != null){
@@ -29,6 +63,8 @@
         }
         */
 %>
+
+
 </head>
 
 <body>

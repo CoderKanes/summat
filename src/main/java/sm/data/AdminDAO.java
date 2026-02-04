@@ -21,6 +21,7 @@ public class AdminDAO {
 		return instance;
 	}//생성자 끝
 	
+	//회원 목록
 	public List<AdminDTO> getMemberList() {
 		List<AdminDTO> list = new ArrayList<AdminDTO>();
 		try {
@@ -64,6 +65,7 @@ public class AdminDAO {
 		return list;
 	}//MemberList end
 	
+	//회원 리스트 페이징 메서드
 	public List<AdminDTO> getMemberList(int start, int end) {
 		List<AdminDTO> list = new ArrayList<AdminDTO>();
 		
@@ -112,6 +114,7 @@ public class AdminDAO {
 		return list;
 	}//end
 	
+	//총 회원 수 
 	public int getAllCount() {
 		int count = 0;
 		try {
@@ -133,6 +136,7 @@ public class AdminDAO {
 		return count;
 	}//getAllcount end
 	
+	//회원 강제 탈퇴(상태변경)
 	public boolean adminDeactivated(String user_id, String user_status) {
 		boolean result = false;
 		try {
@@ -155,6 +159,7 @@ public class AdminDAO {
 		return result;
 	}//Deactivated end
 	
+	//회원 등급 부여
 	public int setGrade(String user_id, int grade) {
 		int result = 0;
 		try {
@@ -173,6 +178,8 @@ public class AdminDAO {
 		}
 		
 		return result;
-	}
+	}//setGrade end
+	
+	
 	
 }//AdminDAO end

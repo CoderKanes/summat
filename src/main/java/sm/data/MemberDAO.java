@@ -109,6 +109,7 @@ public class MemberDAO {
 		return profile_image_url;
 	}//getImage end
 	
+	//로그인 
 	public boolean loginCheck(MemberDTO dto) {
 		boolean result = false;
 		try {
@@ -132,6 +133,7 @@ public class MemberDAO {
 		return result;
 	}//loginCheck end
 	
+	//정보 가져오기 
 	public MemberDTO getInfo(String user_id) {
 		MemberDTO dto = null;
 		try {
@@ -165,6 +167,7 @@ public class MemberDAO {
 		return dto;
 	}//getInfo end
 	
+	//개인정보 수정
 	public void infoUpdate(MemberDTO dto) {
 		try {
 			conn = OracleConnection.getConnection();
@@ -186,6 +189,7 @@ public class MemberDAO {
 		}
 	}//infoupdate end
 	
+	//회원 탈퇴
 	public boolean memberDeactivated(MemberDTO dto, String user_status) {
 		boolean result = false;
 		try {
@@ -212,6 +216,7 @@ public class MemberDAO {
 		return result;
 	}//memberdeactivated end
 	
+	//활성화 상태 체크
 	public boolean isActiveUser(String user_id) {
 		boolean result = false;
 		try {
@@ -238,6 +243,7 @@ public class MemberDAO {
 		return result;
 	}//isActiveUser end
 	
+	//회원 등급 가져오기
 	public int getUserGrade(MemberDTO dto) {
 		int grade = -1;
 		try {

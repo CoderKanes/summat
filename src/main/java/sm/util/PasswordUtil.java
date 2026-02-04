@@ -7,6 +7,7 @@ import java.util.Base64;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+//비번 해시와 솔트 생성 메서드
 public class PasswordUtil {
 	//16바이트 솔트
 	private static final int SALT_LEN = 16;
