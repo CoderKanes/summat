@@ -6,8 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/*
+ * 작성자 : 김용진
+ * 내용 : Oracle DB와의 Connection을 관리하는 유틸리티 클래스.
+ */
 public class OracleConnection {
-
+	//DB Connection 연결을 얻는다.
 	public static Connection getConnection(){
 		Connection connection = null;
 		try {
@@ -29,9 +33,11 @@ public class OracleConnection {
 		return connection;
 	}	
 	
+	//Connection, PreparedStatement의 해제 Method 
 	public static void closeAll(Connection cn, PreparedStatement ps){
 		closeAll(cn,ps,null);
 	}
+	//Connection, PreparedStatement, ResultSet의 해제 Method
 	public static void closeAll(Connection cn, PreparedStatement ps, ResultSet rs){
 		try {
 			if(cn!=null)cn.close();

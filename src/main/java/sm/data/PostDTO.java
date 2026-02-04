@@ -2,6 +2,10 @@ package sm.data;
 
 import java.sql.Timestamp;
 
+/*
+ * 작성자 : 김용진
+ * 내용 : DB.Post Table의 row정보를 담아 전달하기위한 객체
+ */
 public class PostDTO {
 	private int postNum;
 	private String user_id;

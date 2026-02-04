@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    
+<%--
+    작성자 : 김용진
+    내용 : Post를 작성하는 페이지.
+--%>
 
 <%--@ //include file="/common/header.jsp" --%> 
 <%--@ include file="/common/nav.jsp" --%>

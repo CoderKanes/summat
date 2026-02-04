@@ -1,48 +1,54 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="javax.servlet.http.Cookie" %>
+	
+<%--
+    작성자 : 김용진
+    내용 : 메인페이지. 기본적인 진입방식으로 접근했을때 가장 처음 보여줄 페이지.
+--%>
+	
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<title>맛집 페이지 테마 샘플</title>
 	<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
 <%
-    Boolean isAuth = (session != null) ? (Boolean) session.getAttribute("authenticated") : null;
-    
+	Boolean isAuth = null;
+	if (session != null) {
+    	Object authAttr = session.getAttribute("authenticated");
+    	isAuth = (authAttr instanceof Boolean) ? (Boolean) authAttr : null;
+	}
+
+	// 이미 로그인 상태면 그냥 진행
 	if (isAuth == null || !isAuth) {
-        
-		// 로그인 안 되어 있으면 remember-me 쿠키를 확인하고 재생성 시도
-		Cookie[] cookies = request.getCookies();
-        
-		if (cookies != null) {
-			for (javax.servlet.http.Cookie c : cookies) {
-                if ("rememberMe".equals(c.getName())) {
-                    String token = c.getValue();
-                    String[] parts = token != null ? token.split("\\|", 2) : null;
-                    if (parts != null && parts.length == 2) {
-                        String userId = parts[0];
-                        // 서버 측에서 토큰의 유효성을 검증하는 로직이 안전하게 필요합니다.
-                        // 여기서는 간단히 userId로 세션 재생성
-                        HttpSession newSession = request.getSession(true);
-                        newSession.setAttribute("sid", userId);
-                        newSession.setAttribute("authenticated", true);
-                        newSession.setMaxInactiveInterval(30 * 60);
-                        // 재생성 후 원래 페이지로 진행
-                        break;
-                    }
-                }
-            }
-        }
-    }
-%>
-	
-	<%        
-        
-        //로그인 여부
-        boolean isLogin = (boolean)(session != null ? session.getAttribute("authenticated") : null);
-        
-		if(isAuth == null || !is){
-			
-		}
+    	// remember-me 쿠키 확인 및 재생성 시도
+    	Cookie[] cookies = request.getCookies();
+    	if (cookies != null) {
+        	for (Cookie c : cookies) {
+           		if ("rememberMe".equals(c.getName())) {
+                	String token = c.getValue();
+                	String[] parts = token != null ? token.split("\\|", 2) : null;
+                	if (parts != null && parts.length == 2) {
+                    	String userId = parts[0];
+                    	
+                    	//userId로 세션 재생성
+                    	HttpSession newSession = request.getSession(true);
+                    	newSession.setAttribute("sid", userId);
+                    	newSession.setAttribute("authenticated", true);
+                    	newSession.setMaxInactiveInterval(30 * 60); // 30분
+                    	// 재생성 후 isAuth를 true로 설정하여 아래 컨텐츠 흐름에 영향 주지 않게 함
+                    	isAuth = true;
+                    	break;
+                	}
+            	}
+        	}
+    	}
+	}
+
+	// 이후 페이지 로직에서 isAuth 값을 사용
+	if (isAuth == null) {
+    	isAuth = false;
+	}
 		//null 체그
         int grade = 1;
         
@@ -75,7 +81,7 @@
 		<!-- 헤더 글쓰기 -->
 		<button class="icon-btn" onclick="writePost()">✏️</button>
 		<!-- 로그인 여부에 따라 버튼 변경 -->
-		<% if (isLogin) { %>  
+		<% if (isAuth) { %>  
 			<% if (grade == 0) { %>  
 				<button class="theme-btn" onclick="location.href='/summat/admin/memberList.jsp'">회원 관리</button>  
 			<% } else if (grade == 1) { %>  

@@ -7,11 +7,16 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * 작성자 : 김용진
+ * 내용 : 음식리뷰 포스트(Post) 등록, 수정, 삭제, 조회 및 목록 조회 기능을 담당하는 DAO 클래스
+ */
 public class PostDAO {
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
 
+	//post_seq.nextval을 받는 Method
 	public int GetPostSeqNextVal() {
 		int result = 0;
 		try {
@@ -34,6 +39,7 @@ public class PostDAO {
 		return result;
 	}
 
+	//post를 작성사항을 DB.post에 추가하는 Method
 	public boolean insertPost(PostDTO dto) {
 		boolean result = true;
 
@@ -56,7 +62,8 @@ public class PostDAO {
 		}
 		return result;
 	}
-
+	
+	//기존에 작성된 post의 내용을 변경하는 Method
 	public boolean updatePost(PostDTO dto) {
 		boolean result = true;
 
@@ -81,6 +88,7 @@ public class PostDAO {
 		return result;
 	}
 
+	//기존에 작성된 post의 내용을 삭제하는 Method
 	public boolean deletePost(int postNum) {
 		boolean result = true;
 		try {
@@ -99,6 +107,8 @@ public class PostDAO {
 		}
 		return result;
 	}
+	
+	//검색 조건에 해당하는 Post들의 갯수를 반환하는 Method
 	public int getPostListCount(PostQueryCondition condition) {
 		int result = 0;
 
@@ -136,6 +146,7 @@ public class PostDAO {
 		return result;
 	}
 	
+	//paging 범위와, 검색 조건에 해당하는 Post들의 List를 반환하는 Method
 	public List<PostDTO> selectPostList(int start, int end, PostQueryCondition condition) {
 		List<PostDTO> result = null;
 
@@ -198,7 +209,8 @@ public class PostDAO {
 		return result;
 	}
 
-	public String AppendSearchQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
+	//검색 관련 쿼리를 붙여주는 Method. selectPostList와 getPostListCount에서 사용된다.
+	private String AppendSearchQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
 
 		if (condition != null && condition.getKeyword() != null && !condition.getKeyword().isEmpty()) {
 			PostQueryCondition.SearchType type = condition.getSearchType() == null ? PostQueryCondition.SearchType.ALL : condition.getSearchType();
@@ -221,7 +233,8 @@ public class PostDAO {
 		}
 		return baseSql;
 	}
-
+	
+	//필터 관련 쿼리를 붙여주는 Method. selectPostList와 getPostListCount에서 사용된다.
 	public String AppendFilterQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
 		if(condition != null) {		
 			if (condition.getMinViewCount() != null) {
@@ -238,6 +251,7 @@ public class PostDAO {
 		return baseSql;
 	}
 
+	//정렬 관련 쿼리를 붙여주는 Method. selectPostList와 getPostListCount에서 사용된다.
 	public String AppendOrderQuery(String baseSql, PostQueryCondition condition, List<QueryParam> params) {
 		if (condition != null) {
 			PostQueryCondition.OrderType orderType = condition.getOrderType() == null ? PostQueryCondition.OrderType.LATEST : condition.getOrderType();
@@ -256,6 +270,7 @@ public class PostDAO {
 		return baseSql;
 	}
 
+	//하나의 Post 데이터를 얻어오는 Method
 	public PostDTO selectPost(int postNum) {
 		PostDTO result = null;
 
@@ -288,6 +303,7 @@ public class PostDAO {
 		return result;
 	}
 
+	//PreparedStatement에 사용될 Object타입 Param을 명시적타입으로 처리하기 위한 SubClass
 	private static class QueryParam {
 		Object value;
 		int type; // java.sql.Types.INTEGER java.sql.Types.DOUBLE java.sql.Types.VARCHAR

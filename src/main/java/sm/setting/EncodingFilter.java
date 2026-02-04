@@ -11,6 +11,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
+/*
+ * 작성자 : 김용진
+ * 내용 : EncodingFilter. UTF-8로 처리.
+ */
 @WebFilter("/*")
 public class EncodingFilter implements Filter{
 

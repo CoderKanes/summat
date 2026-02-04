@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+<%--
+    작성자 : 김용진
+    내용 : 작성된 Post의 전체 내용을 볼 수 있는 페이지.
+--%>
 
 <jsp:useBean id="dao" class="sm.data.PostDAO" />
 <jsp:useBean id="dto" class="sm.data.PostDTO" />

@@ -3,6 +3,12 @@
     
 <%@ page import="com.oreilly.servlet.MultipartRequest" %>
 <%@ page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy" %>
+
+<%--
+    작성자 : 김용진
+    내용 : postEdit.js에서의 Image file업로드 요청을 처리하기 위한 페이지.
+--%>
+
 <%
     // 파일 저장 경로 (실제 경로로 수정 필요)
     String uploadPath = request.getRealPath("resources/upload");	

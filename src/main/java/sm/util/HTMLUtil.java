@@ -1,7 +1,11 @@
 package sm.util;
 
+/*
+ * 작성자 : 김용진
+ * 내용 : HTML 문자열을 가공·변환하기 위한 공통 유틸리티 클래스
+ */
 public class HTMLUtil {
-
+	// HTML형식 문자열에서 <태그>들을 떼어내고 PlainText를 반환한다.
     public static String htmlContentToPlainText(String htmlContent, boolean keepLineBreaks) {
         if (htmlContent == null || htmlContent.isEmpty()) {
             return "";

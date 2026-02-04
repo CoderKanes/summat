@@ -1,6 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
+<%--
+    작성자 : 김용진
+    내용 : 삭제 요청를 요청하는 페이지
+--%>
+
 
 <%
 	String user_id="test";

@@ -85,6 +85,18 @@
 	  label { text-align: left; }
 	  button, .link { grid-column: 1; justify-self: stretch; }
 	}
+	.remember-row {
+	  display: flex;
+	  align-items: center;
+	  justify-content: flex-start;  /*기본은 왼쪽 정렬, 필요 시 justify-content: flex-end로 오른쪽 배치도 가능 */
+	  gap: 4px; /* 텍스트와 체크박스 사이 간격 조절 /
+	  / 만약 체크박스를 텍스트 오른쪽으로 두고 싶다면 아래 주석 해제 /
+	  / justify-content: flex-end; */
+	  }
+	  .remember-label {
+	  white-space: nowrap; / 텍스트 줄 바꿈 방지 
+	}
+	
 </style>
 </head>
 <body>
@@ -132,8 +144,11 @@
 			   		<label for="password">비밀번호</label>
 			   		<input type="password" id="password" name="password_hash" required placeholder="비밀번호를 입력해주세요" />
 			 	</div>
-			 	<div></div> <!-- 빈 칸으로 라벨+입력 정렬 유지 -->
-			 	
+			 	<div class="form-row remember-row">
+      				<label for="rememberMe" class="remember-label">자동로그인</label>
+      				<input type="checkbox" id="rememberMe" name="rememberMe" />
+    			</div> 
+			 	<div></div>
 			 	<button type="submit">로그인</button>
 			 	<button type="button" onclick="location.href='main.jsp'">메인으로</button>
 			 	

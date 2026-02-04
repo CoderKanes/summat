@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+<%--
+    작성자 : 김용진
+    내용 : Http 404Error 발생시 보여줄 에러페이지.
+--%>
+	
 <!DOCTYPE html>
 <html>
 <head>
