@@ -181,7 +181,7 @@ public class PostDAO {
 				}
 			}
 						
-			System.out.println(sql + ":" +paramDebugString );
+			//System.out.println(sql + ":" +paramDebugString );
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) {

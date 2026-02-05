@@ -3,8 +3,9 @@
 <%@ page import="javax.servlet.http.Cookie" %>
 	
 <%--
-    작성자 : 김용진
-    내용 : 메인페이지. 기본적인 진입방식으로 접근했을때 가장 처음 보여줄 페이지.
+    작성자 : 김용진, 김동욱
+    내용 : 메인페이지. 기본적인 진입방식으로 접근했을때 가장 처음 보여줄 페이지. 
+    	  저장된 쿠키를 불러와 자동 로그인.
 --%>
 	
 <!DOCTYPE html>
@@ -13,6 +14,25 @@
 	<title>맛집 페이지 테마 샘플</title>
 	<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
 <%
+	int grade = 1;
+	//grade null 체그
+	if(session.getAttribute("grade") != null){
+        grade = (Integer)session.getAttribute("grade");
+	}
+	//grade 저장
+/*
+	int grade = 1;
+
+	Object gradeObj = session.getAttribute("grade");
+	if (gradeObj instanceof Integer) {
+        grade = (Integer) gradeObj;
+        // 필요시 0/1 이외의 값도 기본값으로 보정
+        if (grade != 0 && grade != 1) {
+            grade = 1;
+        }
+	}
+*/
+
 	Boolean isAuth = null;
 	if (session != null) {
     	Object authAttr = session.getAttribute("authenticated");
@@ -25,7 +45,8 @@
     	Cookie[] cookies = request.getCookies();
     	if (cookies != null) {
         	for (Cookie c : cookies) {
-           		if ("rememberMe".equals(c.getName())) {
+           		
+        		if ("rememberMe".equals(c.getName())) {
                 	String token = c.getValue();
                 	String[] parts = token != null ? token.split("\\|", 2) : null;
                 	if (parts != null && parts.length == 2) {
@@ -38,36 +59,28 @@
                     	newSession.setMaxInactiveInterval(30 * 60); // 30분
                     	// 재생성 후 isAuth를 true로 설정하여 아래 컨텐츠 흐름에 영향 주지 않게 함
                     	isAuth = true;
-                    	break;
+                    	//쿠키 새 새션에서 재생성
+                    	
+                    	
+                    	
                 	}
+                	
             	}
+        		
+        		if("userGrade".equals(c.getName())){
+        			grade = Integer.parseInt(c.getValue()); 
+        			
+        			break;
+        		}
         	}
     	}
 	}
-
+        		
 	// 이후 페이지 로직에서 isAuth 값을 사용
 	if (isAuth == null) {
     	isAuth = false;
 	}
-		//null 체그
-        int grade = 1;
-        
-        if(session.getAttribute("grade") != null){
-                grade = (Integer)session.getAttribute("grade");
-        }
-        //grade 저장
-        /*
-        int grade = 1;
-        
-        Object gradeObj = session.getAttribute("grade");
-        if (gradeObj instanceof Integer) {
-                grade = (Integer) gradeObj;
-                // 필요시 0/1 이외의 값도 기본값으로 보정
-                if (grade != 0 && grade != 1) {
-                    grade = 1;
-                }
-        }
-        */
+		
 %>
 
 

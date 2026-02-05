@@ -5,6 +5,10 @@
 <head>
 <meta charset="UTF-8">
 <title>logout</title>
+<%--
+	작성자 : 김동욱
+	내용 : 로그아웃 처리 
+ --%>
 </head>
 <body>
 <%	
@@ -21,6 +25,14 @@
 	rm.setSecure(request.isSecure());
 	
 	response.addCookie(rm);
+	
+	Cookie ug = new Cookie("userGrade", "");
+	ug.setPath("/");
+	ug.setMaxAge(0);
+	ug.setHttpOnly(true);
+	ug.setSecure(request.isSecure());
+	
+	response.addCookie(ug);
 	
 	response.sendRedirect("/summat/sm/main.jsp");
 %>

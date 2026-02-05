@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import sm.util.PasswordUtil;
+
 public class MemberDAO {
 	//변수 선언
 	private Connection conn;
@@ -109,6 +111,8 @@ public class MemberDAO {
 		return profile_image_url;
 	}//getImage end
 	
+	
+	//원 버젼 로그인 체크
 	//로그인 
 	public boolean loginCheck(MemberDTO dto) {
 		boolean result = false;
@@ -123,6 +127,41 @@ public class MemberDAO {
 			
 			if(rs.next()) {
 				result = true;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}//loginCheck end
+	
+	
+	//password_hash + salt 거친 비번 비교
+	public boolean loginCheck(String user_id, String plainPassword) {
+		boolean result = false;
+		try {
+			conn = OracleConnection.getConnection();
+			//패스워드는 디비단에서 비교 불가
+			sql = "select * from members where user_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, user_id);
+			rs = pstmt.executeQuery();
+			//패스워드 비교
+			if(rs.next()) {
+				//패스워드 가져와
+				String storedHash = rs.getString("password_hash");
+				//솔트 가져와
+				String salt = rs.getString("password_salt");
+				
+				//입력 받은 패스워드 솔트로 해시
+				String computedHash = PasswordUtil.passwordHash(plainPassword, salt);
+				//이제 입력 받은 값과 디비 비교
+				if(storedHash != null && storedHash.equals(computedHash)) {
+					result = true;
+				}
+				
 			}
 			
 		} catch (Exception e) {

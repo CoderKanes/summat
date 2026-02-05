@@ -6,6 +6,11 @@
 <meta charset="UTF-8">
 <title>메인 로그인/회원가입</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+<%-- 
+	작성자 : 김동욱
+	내용 : 로그인 및 회원가입 폼 페이지.
+--%>
+
 <style type="text/css">
 	body {
 	    font-family: Arial, sans-serif;
@@ -142,7 +147,7 @@
 			 	</div>
 			 	<div>
 			   		<label for="password">비밀번호</label>
-			   		<input type="password" id="password" name="password_hash" required placeholder="비밀번호를 입력해주세요" />
+			   		<input type="password" id="password" name="password" required placeholder="비밀번호를 입력해주세요" />
 			 	</div>
 			 	<div class="form-row remember-row">
       				<label for="rememberMe" class="remember-label">자동로그인</label>
