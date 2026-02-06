@@ -4,16 +4,16 @@
 <%@page import="sm.data.MemberDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    
+<%--
+	작성자 : 김동욱
+	내용 : 로그인 로직 처리 및 세션 / 쿠키 저장
+--%>    
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>로그인 처리</title>
-<%--
-	작성자 : 김동욱
-	내용 : 로그인 로직 처리 및 세션 / 쿠키 저장
- --%>
+
 </head>
 <body>
 		

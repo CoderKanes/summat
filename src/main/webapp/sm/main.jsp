@@ -69,9 +69,12 @@
         		
         		if("userGrade".equals(c.getName())){
         			grade = Integer.parseInt(c.getValue()); 
+        			HttpSession newSession = request.getSession(true);
+        			newSession.setAttribute("grade", grade);
         			
-        			break;
+        			
         		}
+        		break;
         	}
     	}
 	}
