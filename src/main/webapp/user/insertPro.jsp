@@ -50,6 +50,8 @@
 	dto.setPassword_hash(hash);
 
 	dto.setCreated_at(new Timestamp(System.currentTimeMillis()));
+	
+	dto.setEmail_verified(0);
 
 	dao.insert(dto);
 	
@@ -72,8 +74,8 @@
 		//사용자 피드백
 		session.setAttribute("mailError", "인증고드 발송이 실패하였습니다 다시 시도해주세요");
 	}
-	
-	response.sendRedirect("loginForm.jsp");
+	//email인코딩으로 보내기
+	response.sendRedirect("verifyEmailForm.jsp? email=" + java.net.URLEncoder.encode(email, "UTF-8"));
 %>
 </body>
 </html>

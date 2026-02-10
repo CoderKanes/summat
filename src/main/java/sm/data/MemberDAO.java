@@ -304,4 +304,25 @@ public class MemberDAO {
 		return grade;
 	}//getGrade end
 	
+	//email_verified 변경
+	public boolean verifyEmailByEmail(String email) {
+		boolean result = false;
+		try {
+			conn = OracleConnection.getConnection();
+			sql = "update members set email_verified = ? where email = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, 1);
+			pstmt.setString(2, email);
+			int update = pstmt.executeUpdate();
+			if(update > 0) {
+				result = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}//email_verified 변경 end
+	
 }//DAO end

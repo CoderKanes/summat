@@ -14,7 +14,7 @@ public class EmailUtil {
 											  
 	private static final String SMTP_HOST = "smtp.gmail.com";  
     private static final String SMTP_PORT = "587";  
-    private static final String SMTP_USER = "";  
+    private static final String SMTP_USER = "kdw8309@gmail.com";  
     private static final String SMTP_PASSWORD = ""; 
     
     
@@ -45,8 +45,8 @@ public class EmailUtil {
 		//보내는 주소
 		message.setFrom(new InternetAddress(SMTP_USER, "No-Prply"));
 		//받는 주소
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("darkelf1304@naver.com"));
-		session.setDebug(true);
+		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+		//session.setDebug(true);
 		message.setSubject(subject);
 		message.setText(body);
 
