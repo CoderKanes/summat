@@ -1,5 +1,10 @@
 package sm.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /*
  * 작성자 : 김용진
  * 내용 : HTML 문자열을 가공·변환하기 위한 공통 유틸리티 클래스
@@ -38,4 +43,20 @@ public class HTMLUtil {
         }
         return htmlContent.trim();
     } 
+    
+
+	public static List<String> extractAllImgSrc(String html) {
+		List<String> result = new ArrayList<>();
+
+		String regex = "<img[^>]+src\\s*=\\s*\"([^\"]+)\"";
+		Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(html);
+
+		while (matcher.find()) {
+			result.add(matcher.group(1));
+		}
+
+		return result;
+	}
+
 }

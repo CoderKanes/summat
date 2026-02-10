@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="sm.data.PostDTO" %>
+<%@ page import="sm.data.FileDAO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="sm.util.HTMLUtil" %>
 
 <%--
     작성자 : 김용진
@@ -29,7 +33,21 @@
 	<h2> postNum : <%=postNum %> , dto.pnum : <%=dto.getPostNum() %></h2>
 	<%		
 	
-
+	FileDAO fdao = new FileDAO();
+	PostDTO beforeDTO = dao.selectPost(dto.getPostNum());
+	if(beforeDTO !=null){		
+		List<String> imageFiles = HTMLUtil.extractAllImgSrc(beforeDTO.getContent());
+		for(String fname : imageFiles)
+		{
+			fdao.updateFileStatus(fname, FileDAO.FileStatus.UNUSED);
+		}		
+	}
+	
+	List<String> imageFiles = HTMLUtil.extractAllImgSrc(dto.getContent());
+	for(String fname : imageFiles)
+	{
+		fdao.updateFileStatus(fname, FileDAO.FileStatus.INUSE);
+	}		
 
 	boolean modifyResult =dao.updatePost(dto);
 	%>

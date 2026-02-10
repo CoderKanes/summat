@@ -1,50 +1,205 @@
 package sm.data;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+/*
+ * 작성자 : 김용진
+ * 내용 : 가게를 등록 하기 위한 DAO
+ */
 
 public class StoreDAO {
- // 코드 연결 하는 기능 
-    private Connection getConnection() throws Exception {
-        Class.forName("oracle.jdbc.driver.OracleDriver");
-        return DriverManager.getConnection(
-            "jdbc:oracle:thin:@192.168.219.198:1521:orcl",
-            "Web1",
-            "1234"
-        );
-    }
-    
-    // 게시글 등록 하는 기능 
-	public int insertStore(StoreDTO dto) {
-		String sql = "INSERT INTO store (store_name, phone, address) VALUES (?, ?, ?)";
-		int storeId = -1;
 
-		try (Connection conn = getConnection();
-				PreparedStatement ps = conn.prepareStatement(sql, new String[] { "store_id" }))
+	private Connection conn;
+	private PreparedStatement pstmt;
+	private ResultSet rs;
 
-		{
-			System.out.println("insertStore() 시작");
+	// 
+	public int InsertStore(StoreDTO dto) {
+		int resultStoreId = -1;
+	
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "insert into store (Id, name, phone, address, status, created_at) values(store_seq.nextval, ?, ?, ?, 0, sysdate)";
+			 pstmt = conn.prepareStatement(sql, new String[] { "ID" }); 
+			pstmt.setString(1, dto.getName());
+			pstmt.setString(2, dto.getPhone());
+			pstmt.setString(3, dto.getAddress());
 
-			ps.setString(1, dto.getStoreName());
-			ps.setString(2, dto.getPhone());
-			ps.setString(3, dto.getAddress());
-
-			int result = ps.executeUpdate();
-			System.out.println("executeUpdate 결과 = " + result);
-
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next()) {
-				storeId = rs.getInt(1);
-				System.out.println("생성된 storeId = " + storeId);
-			} else {
-				System.out.println("storeId 생성 안 됨");
+			boolean insertresult = pstmt.executeUpdate() > 0;
+			
+			if(insertresult)
+			{
+				rs = pstmt.getGeneratedKeys();
+				if (rs.next()) {
+					resultStoreId = rs.getInt(1);
+				}
 			}
 
 		} catch (Exception e) {
-			System.out.println("insertStore() 예외 발생");
 			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
 		}
-
-		System.out.println("insertStore() 리턴 값 = " + storeId);
-		return storeId;
+		return resultStoreId;
+	}	
+	public StoreDTO GetStoreInfo(int id) {
+		StoreDTO result = null;
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "select * from store where id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = new StoreDTO();				
+				result.setId(rs.getInt("id"));
+				result.setName(rs.getString("name"));
+				result.setPhone(rs.getString("phone"));
+				result.setAddress(rs.getString("address"));
+				result.setStatus(rs.getInt("status"));
+				result.setCreated_at(rs.getTimestamp("created_at"));
+				
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		
+		return result;
 	}
+	
+	public List<StoreDTO> GetAllStores() {
+		List<StoreDTO> result = new ArrayList<StoreDTO>();
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "select * from store";
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				StoreDTO dto = new StoreDTO();				
+				dto.setId(rs.getInt("id"));
+				dto.setName(rs.getString("name"));
+				dto.setPhone(rs.getString("phone"));
+				dto.setAddress(rs.getString("address"));
+				dto.setStatus(rs.getInt("status"));
+				dto.setCreated_at(rs.getTimestamp("created_at"));
+				
+				result.add(dto);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		
+		return result;
+	}
+	
+	public List<StoreDTO> GetUnregistedStores() {
+		List<StoreDTO> result = new ArrayList<StoreDTO>();
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "select * from store where status = 0";
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				StoreDTO dto = new StoreDTO();				
+				dto.setId(rs.getInt("id"));
+				dto.setName(rs.getString("name"));
+				dto.setPhone(rs.getString("phone"));
+				dto.setAddress(rs.getString("address"));
+				dto.setStatus(rs.getInt("status"));
+				dto.setCreated_at(rs.getTimestamp("created_at"));
+				
+				result.add(dto);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		
+		return result;
+	}
+	
+	public boolean updateStoreInfo(StoreDTO dto) {
+		boolean result = true;
+
+		try {
+			conn = OracleConnection.getConnection();
+			
+			String sql = "update store set name = ?, phone = ?, address = ? WHERE id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getName());
+			pstmt.setString(2, dto.getPhone());
+			pstmt.setString(3, dto.getAddress());
+			pstmt.setInt(4, dto.getId());
+			
+			result = pstmt.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			result = false;
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	
+	public boolean updateStoreStatus(int id, int status) {
+		boolean result = true;
+
+		try {
+			conn = OracleConnection.getConnection();
+			
+			String sql = "update store set status = ? WHERE id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, status);
+			pstmt.setInt(2, id);
+			
+			result = pstmt.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			result = false;
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	
+		
+	// 
+	public List<String> deleteStore(int storeId) {
+		List<String> result = new ArrayList<String>();
+		try {
+			conn = OracleConnection.getConnection();			
+
+			String sql = "delete from store  WHERE id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, storeId);
+
+			pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}	
+
 }

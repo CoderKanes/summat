@@ -138,16 +138,12 @@ if (request.getParameter("postNum") != null) {
 			<div class="post-actions">
 				<a href="postMain.jsp" class="btn btn-cancel">목록으로</a>
 
-				<%
-				if (postNum != -1) {
-				%>
+			
 				<a href="postModify.jsp?postNum=<%=postNum%>" class="btn btn-outline"
-					data-password-check>수정</a> <a
-					href="postDeletePro.jsp?postNum=<%=postNum%>" class="btn btn-danger"
+					data-password-check>수정</a>
+				<a href="postDeletePro.jsp?postNum=<%=postNum%>" class="btn btn-danger"
 					data-password-check>삭제</a>
-				<%
-				}
-				%>
+				
 			</div>
 
 		</div>

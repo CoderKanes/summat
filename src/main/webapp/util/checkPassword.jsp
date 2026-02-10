@@ -8,6 +8,7 @@
 
 <%
     String href = request.getParameter("next");
+	boolean bLogin = (session.getAttribute("sid") != null);
 %>
 
 <!DOCTYPE html>
@@ -87,11 +88,11 @@
 <div class="password-wrap">
     <div class="password-card">
         <h2>비밀번호 확인</h2>
+        
         <p>이 작업을 진행하려면 비밀번호를 입력하세요.</p>
-
         <input type="password" id="password" placeholder="비밀번호 입력" autofocus>
-
-        <div class="password-actions">
+	
+	    <div class="password-actions">
             <button class="confirm" type="button" onclick="checkPassword()">확인</button>
             <button class="cancel" type="button" onclick="history.back()">취소</button>
         </div>

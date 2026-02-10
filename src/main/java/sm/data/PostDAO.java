@@ -168,20 +168,17 @@ public class PostDAO {
 				params.add(new QueryParam(end, Types.INTEGER));				
 			}
 			
-			String paramDebugString = "";
+
 			pstmt = conn.prepareStatement(sql);
 			for (int i = 0; i < params.size(); i++) {
 				QueryParam param = params.get(i);
 				if (param.value == null) {
 					pstmt.setNull(i + 1, param.type);
-					paramDebugString+= "["+(i+1)+"]null";
 				} else {
 					pstmt.setObject(i + 1, param.value, param.type);
-					paramDebugString+= "["+(i+1)+"]"+param.value;
 				}
 			}
 						
-			//System.out.println(sql + ":" +paramDebugString );
 			rs = pstmt.executeQuery();
 
 			if (rs.next()) {

@@ -1,24 +1,33 @@
 package sm.data;
 
+import java.sql.Timestamp;
+
 public class StoreDTO {
-    private int storeId;
-    private String storeName;
+    private int Id;
+    private String name;
     private String phone;
     private String address;
-    private String regDate;
+    private int status;
+	private Timestamp created_at;
 
-    public int getStoreId() { return storeId; }
-    public void setStoreId(int storeId) { this.storeId = storeId; }
+   
+	public int getId() { return Id; }
+    public void setId(int Id) { this.Id = Id; }
 
-    public String getStoreName() { return storeName; }
-    public void setStoreName(String storeName) { this.storeName = storeName; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
 
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+    
+    public int getStatus() { return status; }
+	public void setStatus(int status) {	this.status = status; }
+	
+	public Timestamp getCreated_at() {	return created_at;	}
+	public void setCreated_at(Timestamp created_at) {this.created_at = created_at;	}
+    
 
-    public String getRegDate() { return regDate; }
-    public void setRegDate(String regDate) { this.regDate = regDate; }
 }
