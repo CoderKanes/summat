@@ -1,3 +1,5 @@
+<%@page import="java.util.Random"%>
+<%@page import="sm.util.EmailUtil"%>
 <%@page import="sm.util.PasswordUtil"%>
 <%@page import="java.sql.Timestamp"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -50,6 +52,26 @@
 	dto.setCreated_at(new Timestamp(System.currentTimeMillis()));
 
 	dao.insert(dto);
+	
+	//otp생성
+	String otp = String.format("%06d", new Random().nextInt(1000000));
+	
+	//otp세션에 저장
+	session.setAttribute("otp" + email, otp);
+	
+	session.setAttribute("otp_expiry_" + email, System.currentTimeMillis() + 10 * 60 *1000);
+	
+	//이메일 발송
+	String subject = "회원가입 인증코드";
+	String body = "인증코드" + otp + "\n 10분 안에 입력해 주세요";
+	
+	try{
+		EmailUtil.sendEmail(email, subject, body);
+	}catch (Exception e){
+		e.printStackTrace();
+		//사용자 피드백
+		session.setAttribute("mailError", "인증고드 발송이 실패하였습니다 다시 시도해주세요");
+	}
 	
 	response.sendRedirect("loginForm.jsp");
 %>
