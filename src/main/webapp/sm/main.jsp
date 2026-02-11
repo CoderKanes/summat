@@ -111,7 +111,7 @@
 	<nav class="top-nav">
 		<ul>
 			<li class="active">홈</li>
-			<li>음식정보</li>
+			<a href="/summat/food/foodMain.jsp" style="text-decoration: none;"><li>음식정보</li></a>
 			<a href="/summat/post/postMain.jsp" style="text-decoration: none;"><li>포스트</li></a>
 			<a href="/summat/sm/board/list.jsp" style="text-decoration: none;"><li>커뮤니티</li></a>
 		</ul>
