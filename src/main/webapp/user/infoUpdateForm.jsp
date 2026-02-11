@@ -154,10 +154,25 @@
               	<input type="text" name="username" value="<%=dto.getUsername()%>"/>
             </div>
 
-            <label>이메일</label>
-            <div class="field">
-           	  	<input type="text" name="email" value="<%=dto.getEmail() %>"/>
-            </div>
+            <!-- 이메일 필드 -->
+			<label>이메일</label>
+			<div class="field" style="display:flex; gap:8px; align-items:center;">
+  				<input type="text" id="email" name="email" value="<%=dto.getEmail() %>" />
+  				<button type="button" class="btn secondary" onclick="openVerify()">이메일 인증</button>
+  				<span id="email_status" style="margin-left:8px; color:#28a745;">
+<%
+	if(dto.getEmail_verified() == 1) { 
+%>
+		인증됨
+<% 
+	} else { 
+%>
+		미인증
+<% 
+	} 
+%>
+  </span>
+</div>
             
             <label>주소</label>
             <div class="field">
@@ -185,6 +200,10 @@
             <input type="submit" value="수정" class="btn" />
             <input type="reset" value="다시쓰기" class="btn secondary" />
 		</div>
+		
+		<div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:800px; margin-bottom:12px;">
+  			<button type="button" class="btn secondary" onclick="goMain()">메인으로 돌아가기</button>
+		</div>
 	</form>
 </div>
 
@@ -200,6 +219,19 @@
 		}else{
 			return true;
 		}	
+	}
+	
+	function openVerify() {
+		var email = document.getElementBiId('email').value.trim();
+		if(!email){
+			window.location.href='verifyEmailForm.jsp';
+		}else{
+			window.location.href='resendOtp.jsp.jsp?email=' + encodeURIComponent(email);
+		}
+	}
+	
+	function goMain() {
+		window.location.href='/summat/sm/main.jsp';
 	}
 	
 </script>

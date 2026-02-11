@@ -38,7 +38,7 @@
 	//grade얻기
 	session.setAttribute("grade", dao.getUserGrade(dto));
 	int gradeValue = dao.getUserGrade(dto);
-	
+	/*
 	//ACTIVE 로그인 체크 실행 DEACTIVE 실행 안함
 	//일반 로그인 체크
 	if(isActive){
@@ -50,14 +50,15 @@
 	}else{
 		result = false;
 	}
+	*/
 	//해시 솔트 후 비번 체크
-	/*
+	
 	if(isActive){
 		result = dao.loginCheck(user_id, plainPassword);
 	}else{
 		result = false;
 	}
-	*/
+	
 	//result가 투루이면 세션에 id 저장 후 메인으로 보내기
 	if(result){
 		//아이디 저장

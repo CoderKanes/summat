@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import sm.util.PasswordUtil;
+
 public class AdminDAO {
 	//변수 선언
 	private Connection conn;
@@ -301,6 +303,7 @@ public class AdminDAO {
 		return result;
 	}//setGrade end
 	
+	//삭제
 	public int deleteUser(String user_id) {
 		int result = 0;
 		try {
@@ -316,6 +319,34 @@ public class AdminDAO {
 			OracleConnection.closeAll(conn, pstmt, rs);
 		}
 		return result;
-	}
+	}//delete end
+	
+	//해시 솔트 비교
+	public boolean verifyPassword(String user_id, String plainPassword) {
+        if (user_id == null || plainPassword == null) return false;
+        boolean result = false;
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = OracleConnection.getConnection();
+            sql = "select password_hash, password_salt from members where user_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, user_id);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+                String salt = rs.getString("password_salt");
+                if (storedHash == null || salt == null || salt.trim().isEmpty()) return false;
+                String computed = PasswordUtil.passwordHash(plainPassword, salt);
+                result = storedHash.equals(computed);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            OracleConnection.closeAll(conn, pstmt, rs);
+        }
+        return result;
+    }
 	
 }//AdminDAO end

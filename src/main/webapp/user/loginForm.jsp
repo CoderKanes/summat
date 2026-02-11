@@ -140,22 +140,27 @@
 			<h2>로그인</h2>
 			
 			<!-- 로그인 폼 -->
-			<form id="loginForm" onsubmit="handleLogin(event)" action="loginPro.jsp">
-				<div>
-			   		<label for="user_id">아이디</label>
-			   		<input type="text" id="user_id" name="user_id" required placeholder="아이디를 입력해 주세요" />
-			 	</div>
-			 	<div>
-			   		<label for="password">비밀번호</label>
-			   		<input type="password" id="password" name="password" required placeholder="비밀번호를 입력해주세요" />
-			 	</div>
-			 	<div class="form-row remember-row">
-      				<label for="rememberMe" class="remember-label">자동로그인</label>
-      				<input type="checkbox" id="rememberMe" name="rememberMe" />
-    			</div> 
+			<form id="loginForm" onsubmit="handleLogin(event)" action="loginPro.jsp" method="post">
+			  	<div>
+			    	<label for="user_id">아이디</label>
+			    	<input type="text" id="user_id" name="user_id" required placeholder="아이디를 입력해 주세요" />
+			  	</div>
+			
+			  	<div>
+			    	<label for="password">비밀번호</label>
+			    	<input type="password" id="password" name="password" required placeholder="비밀번호를 입력해주세요" />
+			  	</div>
+			 	<div style="grid-column:2; display:flex; align-items:center; gap:6px;">
+  					<input type="checkbox" id="rememberMe" name="rememberMe" style="width:16px; height:16px; margin:0;" />
+  					<label for="rememberMe" style="margin:0; cursor:pointer; font-size:14px;">자동로그인</label>
+				</div>
 			 	<div></div>
-			 	<button type="submit">로그인</button>
-			 	<button type="button" onclick="location.href='main.jsp'">메인으로</button>
+			 	
+			 	<div style="display:flex; gap:8px; align-items:center;">
+    				<button type="submit" style="justify-self:start;">로그인</button>
+    				<button type="button" onclick="location.href='main.jsp'">메인으로</button>
+      				<button type="button" onclick="location.href='verifyEmailForm.jsp'">이메일 인증</button>
+  				</div>
 			 	
 			 	<div style="grid-column:2; margin-top:8px;">
 			   		<span>계정이 없으신가요?</span>

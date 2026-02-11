@@ -55,27 +55,9 @@
 
 	dao.insert(dto);
 	
-	//otp생성
-	String otp = String.format("%06d", new Random().nextInt(1000000));
-	
-	//otp세션에 저장
-	session.setAttribute("otp" + email, otp);
-	
-	session.setAttribute("otp_expiry_" + email, System.currentTimeMillis() + 10 * 60 *1000);
-	
-	//이메일 발송
-	String subject = "회원가입 인증코드";
-	String body = "인증코드" + otp + "\n 10분 안에 입력해 주세요";
-	
-	try{
-		EmailUtil.sendEmail(email, subject, body);
-	}catch (Exception e){
-		e.printStackTrace();
-		//사용자 피드백
-		session.setAttribute("mailError", "인증고드 발송이 실패하였습니다 다시 시도해주세요");
-	}
-	//email인코딩으로 보내기
-	response.sendRedirect("verifyEmailForm.jsp? email=" + java.net.URLEncoder.encode(email, "UTF-8"));
+	// 가입 후 안내 (인증은 별도)
+    session.setAttribute("verifyMsg", "회원가입이 완료되었습니다. 이메일 인증은 로그인 후 진행하세요.");
+    response.sendRedirect("loginForm.jsp");
 %>
 </body>
 </html>

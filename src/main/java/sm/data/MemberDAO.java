@@ -30,7 +30,7 @@ public class MemberDAO {
 	public void insert(MemberDTO dto) {
 		try {
 			conn = OracleConnection.getConnection();
-			sql = "insert into members (user_id, username, email, phone, address, resident_registration_number, password_hash, password_salt, created_at) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			sql = "insert into members (user_id, username, email, phone, address, resident_registration_number, password_hash, password_salt, created_at,  email_verified) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, dto.getUser_id());
 			pstmt.setString(2, dto.getUsername());
@@ -41,6 +41,8 @@ public class MemberDAO {
 			pstmt.setString(7, dto.getPassword_Hash());
 			pstmt.setString(8, dto.getPassword_salt());
 			pstmt.setTimestamp(9, dto.getCreated_at());
+			
+	        pstmt.setInt(10, dto.getEmail_verified());
 			
 			pstmt.executeUpdate();
 			
@@ -115,53 +117,44 @@ public class MemberDAO {
 	//원 버젼 로그인 체크
 	//로그인 
 	public boolean loginCheck(MemberDTO dto) {
-		boolean result = false;
-		try {
-			conn = OracleConnection.getConnection();
-			
-			sql = "select * from members where user_id = ? and password_hash = ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, dto.getUser_id());
-			pstmt.setString(2, dto.getPassword_hash());
-			rs = pstmt.executeQuery();
-			
-			if(rs.next()) {
-				result = true;
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally {
-			OracleConnection.closeAll(conn, pstmt, rs);
-		}
-		return result;
+		 if (dto == null || dto.getUser_id() == null || dto.getPassword_hash() == null) {
+			 return false;
+		 }
+	     String userId = dto.getUser_id();
+	     String inputPasswordOrHash = dto.getPassword_hash(); // 기존 관행: 평문이 들어옴
+	     return loginCheck(userId, inputPasswordOrHash);
 	}//loginCheck end
 	
 	
 	//password_hash + salt 거친 비번 비교
 	public boolean loginCheck(String user_id, String plainPassword) {
-		boolean result = false;
-		try {
+		 if (user_id == null || plainPassword == null) {
+			 return false;
+		 }
+		 boolean result = false;
+		 try {
 			conn = OracleConnection.getConnection();
 			//패스워드는 디비단에서 비교 불가
-			sql = "select * from members where user_id = ?";
+			sql = "select password_hash, password_salt from members where user_id = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, user_id);
 			rs = pstmt.executeQuery();
-			//패스워드 비교
-			if(rs.next()) {
-				//패스워드 가져와
+			if (rs.next()) {
 				String storedHash = rs.getString("password_hash");
-				//솔트 가져와
 				String salt = rs.getString("password_salt");
-				
-				//입력 받은 패스워드 솔트로 해시
+
+				// 안전성: salt 또는 storedHash가 비어있으면 로그인 실패 처리
+				if (salt == null || salt.trim().isEmpty() || storedHash == null) {
+					return false;
+				}
+
+				// 입력된 값이 이미 해시(예외적 상황)인지 간단히 판별하려면 길이/패턴 체크 가능.
+				// 그러나 시스템 전체가 salt+hash를 사용하므로 입력은 평문으로 기대.
 				String computedHash = PasswordUtil.passwordHash(plainPassword, salt);
-				//이제 입력 받은 값과 디비 비교
-				if(storedHash != null && storedHash.equals(computedHash)) {
+
+				if (storedHash.equals(computedHash)) {
 					result = true;
 				}
-				
 			}
 			
 		} catch (Exception e) {
@@ -208,19 +201,43 @@ public class MemberDAO {
 	
 	//개인정보 수정
 	public void infoUpdate(MemberDTO dto) {
+		if (dto == null || dto.getUser_id() == null || dto.getPassword_hash() == null) {
+			return;
+		}
+		
 		try {
 			conn = OracleConnection.getConnection();
-			sql = "update members set username = ?, email = ?, phone = ?, address = ? where user_id = ? and password_hash = ?";
+			//비번 해시해서 비교
+			sql = "select password_hash, password_salt from members where user_id = ?";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, dto.getUsername());
-			pstmt.setString(2, dto.getEmail());
-			pstmt.setString(3, dto.getPhone());
-			pstmt.setString(4, dto.getAddress());
-			pstmt.setString(5, dto.getUser_id());
-			pstmt.setString(6, dto.getPassword_hash());
-			
-			pstmt.executeUpdate();
-			
+            pstmt.setString(1, dto.getUser_id());
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+                String salt = rs.getString("password_salt");
+                if (salt == null || salt.trim().isEmpty() || storedHash == null) {
+                	return;
+                }
+
+                String inputPlain = dto.getPassword_hash(); // 기존 관행: 평문이 들어옴
+                String computedHash = PasswordUtil.passwordHash(inputPlain, salt);
+                if (!storedHash.equals(computedHash)) {
+                	return; // 비밀번호 불일치
+                }
+                
+                rs.close();
+                pstmt.close();
+                
+                sql = "update members set username = ?, email = ?, phone = ?, address = ? where user_id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, dto.getUsername());
+                pstmt.setString(2, dto.getEmail());
+                pstmt.setString(3, dto.getPhone());
+                pstmt.setString(4, dto.getAddress());
+                pstmt.setString(5, dto.getUser_id());
+                pstmt.executeUpdate();
+                
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -230,21 +247,35 @@ public class MemberDAO {
 	
 	//회원 탈퇴
 	public boolean memberDeactivated(MemberDTO dto, String user_status) {
+		 if (dto == null || dto.getUser_id() == null || dto.getPassword_hash() == null) {
+			 return false;
+		 }
 		boolean result = false;
 		try {
 			conn = OracleConnection.getConnection();
 			//유저 상태 변경 업데이트에 날짜 기록
-			sql = "update members set user_status = ?, updated_at = current_date where user_id =? and password_hash = ?";
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, user_status);
-			pstmt.setString(2, dto.getUser_id());
-			pstmt.setString(3, dto.getPassword_hash());
-			
-			int update = pstmt.executeUpdate();
-			
-			if(update > 0) {
-				result = true;
-			}
+			sql = "select password_hash, password_salt from members where user_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, dto.getUser_id());
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+                String salt = rs.getString("password_salt");
+                if (salt == null || salt.trim().isEmpty() || storedHash == null) return false;
+
+                String inputPlain = dto.getPassword_hash(); // 기존 관행: 평문이 들어옴
+                String computedHash = PasswordUtil.passwordHash(inputPlain, salt);
+                if (!storedHash.equals(computedHash)) return false;
+
+                rs.close();
+                pstmt.close();
+                sql = "update members set user_status = ?, updated_at = current_date where user_id = ?";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, user_status);
+                pstmt.setString(2, dto.getUser_id());
+                int update = pstmt.executeUpdate();
+                if (update > 0) result = true;
+            }
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -324,5 +355,58 @@ public class MemberDAO {
 		}
 		return result;
 	}//email_verified 변경 end
+	
+	//이메일 존재확인
+	public boolean existsByEmail(String email) {
+		boolean result = false;
+		try {
+			conn = OracleConnection.getConnection();
+			sql = "select 1 from members where email = ? and rownum = 1";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, email);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}//existsByEmail end
+	
+	//email로 회원조회
+	public MemberDTO findByEmail(String email) {
+		MemberDTO dto = null;
+		
+		try {
+			conn = OracleConnection.getConnection();
+			sql = "select * from members where email = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, email);
+			rs = pstmt.executeQuery();
+			if(rs.next()){
+				dto = new MemberDTO();
+				
+				 dto.setUser_id(rs.getString("user_id"));
+		         dto.setUsername(rs.getString("username"));
+		         dto.setEmail(rs.getString("email"));
+		         dto.setPhone(rs.getString("phone"));
+		         dto.setAddress(rs.getString("address"));
+		         dto.setResident_registration_number(rs.getString("resident_registration_number"));
+		         dto.setPassword_Hash(rs.getString("password_hash")); // DTO 메서드 이름에 맞춰 조정
+		         dto.setPassword_salt(rs.getString("password_salt"));
+		         dto.setCreated_at(rs.getTimestamp("created_at"));
+		         dto.setEmail_verified(rs.getInt("email_verified"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return dto;
+	}
 	
 }//DAO end
