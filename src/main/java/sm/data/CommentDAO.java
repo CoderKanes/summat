@@ -18,8 +18,8 @@ public class CommentDAO {
 		}
 	}
 
-	// 1️⃣ 특정 게시글의 댓글 목록 조회
-	public List<CommentDTO> getCommentsByBoardNum(int boardNum) {
+	// 1️ 특정 게시글의 댓글 목록 조회
+	public List<CommentDTO> getCommentsByBoard_Num(int boardNum) {
 		List<CommentDTO> list = new ArrayList<>();
 		String sql = "SELECT id, board_num, writer, content, regdate FROM BOARD_COMMENT WHERE board_num=? ORDER BY id ASC";
 
@@ -29,7 +29,7 @@ public class CommentDAO {
 				while (rs.next()) {
 					CommentDTO c = new CommentDTO();
 					c.setId(rs.getInt("id"));
-					c.setBoardNum(rs.getInt("board_num"));
+					c.setBoard_Num(rs.getInt("board_num"));
 					c.setWriter(rs.getString("writer"));
 					c.setContent(rs.getString("content"));
 					Timestamp ts = rs.getTimestamp("regdate");
@@ -45,21 +45,22 @@ public class CommentDAO {
 		return list;
 	}
 
-	// 2️⃣ 댓글 작성
+	// 댓글 등록 ( ID 는 외부에서 생성되어 전달됨)
 	public void insertComment(CommentDTO comment) {
-		String sql = "INSERT INTO BOARD_COMMENT(id, board_num, writer, content, regdate) VALUES(?,?,?,?, SYSDATE)";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, comment.getId());
-			ps.setInt(2, comment.getBoardNum());
-			ps.setString(3, comment.getWriter());
-			ps.setString(4, comment.getContent());
-			ps.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	    String sql = "INSERT INTO BOARD_COMMENT(id, board_num, password, content, writer, regdate) " +
+	                 "VALUES(board_comment_seq.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
 
-	// 3️⃣ 특정 게시글의 댓글 수 조회
+	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setInt(1, comment.getBoard_Num());      // board_num
+	        ps.setString(2, comment.getPassword());    // password
+	        ps.setString(3, comment.getContent());     // content
+	        ps.setString(4, comment.getWriter());      // writer
+	        ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	// 3️  특정 게시글의 댓글 수 조회
 	public int getCommentCountByBoardNum(int boardNum) {
 		int count = 0;
 		String sql = "SELECT COUNT(*) FROM BOARD_COMMENT WHERE board_num=?";
@@ -73,10 +74,26 @@ public class CommentDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return count;    
+		
+	}
+	
+	public int get이글의댓글개수(int 글번호)
+	{
+		int count=0;
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM BOARD_COMMENT WHERE board_num=?");
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		return count;
 	}
 
-	// DB 연결 종료
+	// DB Connection 종료
 	public void close() {
 		try {
 			if (conn != null)
@@ -85,4 +102,31 @@ public class CommentDAO {
 			e.printStackTrace();
 		}
 	}
+
+    // 3. 댓글 삭제
+    public boolean deleteComment(String writer ,String password) {
+        String sql = "DELETE FROM BOARD_COMMENT WHERE writer=? and password=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, writer);
+            ps.setString(2, password);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // 4. 댓글 수정
+    public boolean updateComment(int id, String content) {
+        String sql = "UPDATE BOARD_COMMENT SET content=? WHERE id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, content);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
