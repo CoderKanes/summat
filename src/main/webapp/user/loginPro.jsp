@@ -1,110 +1,109 @@
-
 <%@page import="java.util.UUID"%>
 <%@page import="sm.data.MemberDTO"%>
 <%@page import="sm.data.MemberDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%--
-	작성자 : 김동욱
-	내용 : 로그인 로직 처리 및 세션 / 쿠키 저장
---%>    
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>로그인 처리</title>
-
 </head>
 <body>
-		
 <%
-	MemberDTO dto = new MemberDTO();
-	
-	String user_id = request.getParameter("user_id");
-	String plainPassword = request.getParameter("password");//비번 받아서 
-	
-	
-	
-	dto.setUser_id(user_id);
-	
-	dto.setPassword_hash(plainPassword);
-	
-	MemberDAO dao = MemberDAO.getInstance();
-	
-	//isActiveUser 호출해서 user_status확인
-	boolean isActive = dao.isActiveUser(user_id);
-	//result에 dao.loginCheck넣을지 말지
-	boolean result = false;
-	//grade얻기
-	session.setAttribute("grade", dao.getUserGrade(dto));
-	int gradeValue = dao.getUserGrade(dto);
-	/*
-	//ACTIVE 로그인 체크 실행 DEACTIVE 실행 안함
-	//일반 로그인 체크
-	if(isActive){
-		result = dao.loginCheck(dto);
-		
-		if(!result){
-			result = dao.loginCheck(user_id, plainPassword);
-		}
-	}else{
-		result = false;
-	}
-	*/
-	//해시 솔트 후 비번 체크
-	
-	if(isActive){
-		result = dao.loginCheck(user_id, plainPassword);
-	}else{
-		result = false;
-	}
-	
-	//result가 투루이면 세션에 id 저장 후 메인으로 보내기
-	if(result){
-		//아이디 저장
-		session.setAttribute("sid", dto.getUser_id());
-		//인증여부
-		session.setAttribute("authenticated", true);
-		//시간 30분
-		session.setMaxInactiveInterval(30 * 60);
-		
-		//쿠키 처리
-		//체크박스 체그확인
-		String remember = request.getParameter("rememberMe");
-		if("on".equals(remember)){
-			//토큰생성
-			//				id + 랜덤 글자 Ex) java|fjdiao1341234ji의 형태
-			String token = dto.getUser_id() + "|" + UUID.randomUUID().toString();
-			//쿠킹에 토큰 저장
-			Cookie rememberCookie = new Cookie("rememberMe", token);
-			//grade 쿠키 생성 및 저장
-			Cookie gradeCookie =  new Cookie("userGrade", String.valueOf(gradeValue));
-			//리멤버 쿠키 모든 브라우저에 전달
-			rememberCookie.setPath("/");
-			gradeCookie.setPath("/");
-			//7일
-			rememberCookie.setMaxAge(7 * 24 * 60 * 60);
-			gradeCookie.setMaxAge(7 * 24 * 60 * 60);
-			//보안설정
-			rememberCookie.setHttpOnly(true);
-			gradeCookie.setHttpOnly(true);
-			//hppts일 때에만 응답
-			rememberCookie.setSecure(request.isSecure());
-			gradeCookie.setSecure(request.isSecure());
-			
-			response.addCookie(rememberCookie);
-			response.addCookie(gradeCookie);
-		}
-		
-		response.sendRedirect("/summat/sm/main.jsp");
-	}else{
-%>		
-		<script type="text/javascript">
-			alert("아이디와 비밀번호를 확인하세요");
-			history.go(-1);
-		</script>
+    MemberDTO dto = new MemberDTO();
+
+    String user_id = request.getParameter("user_id");
+    String plainPassword = request.getParameter("password"); // 비번 받아서
+
+    if (user_id == null) user_id = "";
+    if (plainPassword == null) plainPassword = "";
+
+    dto.setUser_id(user_id);
+    dto.setPassword_hash(plainPassword);
+
+    MemberDAO dao = MemberDAO.getInstance();
+
+    // isActiveUser 호출해서 user_status 확인
+    boolean isActive = false;
+    try {
+        isActive = dao.isActiveUser(user_id);
+    } catch (Exception e) {
+        e.printStackTrace();
+        isActive = false;
+    }
+
+    // 로그인 체크
+    boolean result = false;
+    if (isActive) {
+        try {
+            result = dao.loginCheck(user_id, plainPassword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = false;
+        }
+    } else {
+        result = false;
+    }
+
+    // 로그인 성공 처리: 세션, grade 조회, 쿠키
+    if (result) {
+        // 세션 설정
+        session.setAttribute("sid", user_id);
+        session.setAttribute("authenticated", true);
+        session.setMaxInactiveInterval(30 * 60); // 30분
+
+        // grade는 로그인 성공 후 한 번만 조회
+        int gradeValue = 1;
+        try {
+            // DAO의 getUserGrade가 MemberDTO 기반이면 dto.user_id가 이미 설정되어 있으므로 사용
+            gradeValue = dao.getUserGrade(dto);
+            // DAO에 user_id 기반 메서드가 있으면 그걸 쓰는 게 더 명확함:
+            // gradeValue = dao.getUserGradeById(user_id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            gradeValue = 1;
+        }
+        session.setAttribute("grade", gradeValue);
+
+        // 쿠키 처리 (자동로그인)
+        String remember = request.getParameter("rememberMe");
+        if ("on".equals(remember) && user_id != null && !user_id.isEmpty()) {
+            // 토큰 생성 (주의: 서버에 저장/검증하지 않음)
+            String token = user_id + "|" + UUID.randomUUID().toString();
+
+            Cookie rememberCookie = new Cookie("rememberMe", token);
+            Cookie gradeCookie = new Cookie("userGrade", String.valueOf(gradeValue));
+
+            rememberCookie.setPath("/");
+            gradeCookie.setPath("/");
+
+            rememberCookie.setMaxAge(7 * 24 * 60 * 60);
+            gradeCookie.setMaxAge(7 * 24 * 60 * 60);
+
+            rememberCookie.setHttpOnly(true);
+            gradeCookie.setHttpOnly(true);
+
+            rememberCookie.setSecure(request.isSecure());
+            gradeCookie.setSecure(request.isSecure());
+
+            response.addCookie(rememberCookie);
+            response.addCookie(gradeCookie);
+
+            // 권고: 토큰을 DB에 저장/검증하지 않는다면 보안상 취약하니 운용 주의
+        }
+
+        // 리다이렉트 (컨텍스트 패스 사용 권장)
+        String ctx = request.getContextPath();
+        response.sendRedirect(ctx + "/sm/main.jsp");
+    } else {
+%>
+    <script type="text/javascript">
+        alert("아이디와 비밀번호를 확인하세요");
+        history.go(-1);
+    </script>
 <%
-	}	
+    }
 %>
 </body>
 </html>

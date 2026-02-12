@@ -62,8 +62,11 @@
 %>
 
 <div class="header-row">
-  <div class="page-title">관리자 대시보드</div>
-
+  <div class="page-title">
+  	관리자 대시보드
+  	<button type="button" onclick="document.location.href='/summat/admin/memberList.jsp'">리스트로</button>
+  	<button type="button" onclick="document.location.href='/summat/sm/main.jsp'">메인으로</button>
+  </div>
   <!-- 검색 폼 -->
   <form class="search-form" method="get" action="dashboard.jsp">
     <input type="text" name="searchQuery" placeholder="아이디/이름 검색" value="<%= (request.getParameter("searchQuery") != null) ? request.getParameter("searchQuery") : "" %>">
