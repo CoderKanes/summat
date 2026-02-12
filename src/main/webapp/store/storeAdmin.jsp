@@ -96,12 +96,14 @@
 		<tbody><%
 			for(StoreDTO dto : list){%>
 			<tr>
+				
 				<td><%=dto.getId()%></td>
-				<td><%=dto.getName()%></td>
+				<td><a href ="/summat/store/storeView.jsp?storeId=<%=dto.getId()%>"><%=dto.getName()%></a></td>
 				<td><%=dto.getAddress()%></td>
 				<td><%=dto.getPhone()%></td>
 				<td><%=dto.getStatus()%></td>
 				<td><%=dto.getCreated_at()%></td>
+				
 			</tr>
 			<%
 				}

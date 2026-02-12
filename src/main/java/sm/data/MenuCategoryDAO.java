@@ -21,7 +21,7 @@ public class MenuCategoryDAO {
 	private PreparedStatement pstmt;
 	private ResultSet rs;
 		
-	public Map<String, Integer> getCultureCategoryMap() {
+	public Map<String, Integer> getCultureCategoryReverseMap() {
 		Map<String, Integer> result = new LinkedHashMap<String, Integer>();
 		try {
 			conn = OracleConnection.getConnection();
@@ -42,7 +42,7 @@ public class MenuCategoryDAO {
 		return result;
 	}
 	
-	public Map<String, Integer> getFoodTypeMap() {
+	public Map<String, Integer> getFoodTypeReverseMap() {
 		Map<String, Integer> result = new LinkedHashMap<String, Integer>();
 		try {
 			conn = OracleConnection.getConnection();
@@ -53,6 +53,87 @@ public class MenuCategoryDAO {
 			while(rs.next())
 			{
 				result.put(rs.getString("name"), rs.getInt("id"));
+			}	
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	public Map<String, Integer> getFoodItemReverseMap() {
+		Map<String, Integer> result = new LinkedHashMap<String, Integer>();
+		try {
+			conn = OracleConnection.getConnection();
+			
+			String sql = "select * from FOOD_ITEM ORDER BY id";
+			pstmt = conn.prepareStatement(sql);			
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				result.put(rs.getString("name"), rs.getInt("id"));
+			}	
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	public Map<Integer,String> getCultureCategoryMap() {
+		Map<Integer, String> result = new LinkedHashMap<Integer, String>();
+		try {
+			conn = OracleConnection.getConnection();
+			
+			String sql = "select * from CULTURE_CATEGORY ORDER BY id";
+			pstmt = conn.prepareStatement(sql);			
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				result.put(rs.getInt("id"),rs.getString("name"));
+			}	
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	
+	public Map<Integer,String> getFoodTypeMap() {
+		Map<Integer, String> result = new LinkedHashMap<Integer, String>();
+		try {
+			conn = OracleConnection.getConnection();
+			
+			String sql = "select * from FOODTYPE_CATEGORY ORDER BY id";
+			pstmt = conn.prepareStatement(sql);			
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				result.put(rs.getInt("id"), rs.getString("name"));
+			}	
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	public Map<Integer,String> getFoodItemMap() {
+		Map<Integer, String> result = new LinkedHashMap<Integer, String>();
+		try {
+			conn = OracleConnection.getConnection();
+			
+			String sql = "select * from FOOD_ITEM ORDER BY id";
+			pstmt = conn.prepareStatement(sql);			
+			rs = pstmt.executeQuery();
+			while(rs.next())
+			{
+				result.put(rs.getInt("id"), rs.getString("name"));
 			}	
 
 		} catch (Exception e) {

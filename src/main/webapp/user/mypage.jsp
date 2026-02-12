@@ -62,6 +62,11 @@
   	function goMain() {
     	window.location.href = '/summat/sm/main.jsp'; // 메인 페이지 경로로 수정 필요
   	}
+  	
+	// 상점 신청 페이지로
+  	function goStoreRegist() {
+    	window.location.href = '/summat/store/storeRegist.jsp'; 
+  	}
 
   	// 탈퇴 확인 및 이동 예시
   	function withdraw() {
@@ -82,7 +87,7 @@
 	String profile_image_url = dao.getImage(user_id);
 	
 %>
-	<div class="card row" style="align-items:center;">
+	<div class="card row" style="align-items:center; ">
   		<img src="/summat/resources/profile/<%=profile_image_url%>" alt="사진" class="avatar" />
 
   		<!-- 사진 변경 버튼 + 파일 입력 -->
@@ -106,5 +111,10 @@
   		<button class="btn danger" onclick="withdraw()">회원 탈퇴</button>
   		<button class="btn" onclick="goMain()">메인으로 돌아가기</button>
 	</div>
+	</div>
+		
+	<span style="display: block;">
+  		<button class="btn" onclick="goStoreRegist();">가게 등록 신청</button>  		
+	</span>
 </body>
 </html>

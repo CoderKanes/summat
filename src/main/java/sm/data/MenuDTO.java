@@ -1,4 +1,7 @@
 package sm.data;
+
+import java.util.List;
+
 public class MenuDTO {
     private int Id;
     private int storeId;
@@ -8,6 +11,10 @@ public class MenuDTO {
     private String menu_desc;
     private int price;
     private String image;
+    private String cCategory_str;
+    private String fCategory_str;
+    private String foodItem_str;
+
 	public int getId() {
 		return Id;
 	}
@@ -56,6 +63,23 @@ public class MenuDTO {
 	public void setImage(String image) {
 		this.image = image;
 	}
-    
+	public String getCCategory_str() {
+		return cCategory_str;
+	}
+	public void setCCategory_str(String cCategory_str) {
+		this.cCategory_str = cCategory_str;
+	}
+	public String getFCategory_str() {
+		return fCategory_str;
+	}
+	public void setFCategory_str(String fCategory_str) {
+		this.fCategory_str = fCategory_str;
+	}
+	public String getFoodItem_str() {
+		return foodItem_str;
+	}
+	public void setFoodItem_str(String foodItem_str) {
+		this.foodItem_str = foodItem_str;
+	}
 
 }

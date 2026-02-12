@@ -26,7 +26,7 @@ body {
 
 label {
     display: inline-block;
-    width: 120px;
+    min-width: 120px;
 }
 
 input[type=text] {

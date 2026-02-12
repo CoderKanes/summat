@@ -144,7 +144,9 @@ if (request.getParameter("postNum") != null) {
 				<a href="postDeletePro.jsp?postNum=<%=postNum%>" class="btn btn-danger"
 					data-password-check>삭제</a>
 				
-			</div>
+			</div>		
+			
+			<jsp:include page="postComment.jsp"></jsp:include>
 
 		</div>
 

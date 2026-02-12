@@ -66,6 +66,7 @@
   	관리자 대시보드
   	<button type="button" onclick="document.location.href='/summat/admin/memberList.jsp'">리스트로</button>
   	<button type="button" onclick="document.location.href='/summat/sm/main.jsp'">메인으로</button>
+  	<button type="button" onclick="document.location.href='/summat/store/storeAdmin.jsp'">상점신청승인페이지</button>
   </div>
   <!-- 검색 폼 -->
   <form class="search-form" method="get" action="dashboard.jsp">

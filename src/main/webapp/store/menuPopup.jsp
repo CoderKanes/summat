@@ -40,7 +40,7 @@ body {
 
 label {
     display: inline-block;
-    width: 80px;
+    min-width: 80px;
 }
 
 img {
@@ -88,36 +88,50 @@ function previewImg(input) {
 function submitMenu() {
     const nameInput = document.getElementById('name');
     const priceInput = document.getElementById('price');
-    const preview = document.getElementById('preview').src;
+    const previewSrc = document.getElementById('preview').src;
 
-    const name = nameInput.value.trim();  // 공백 제거
+    const name = nameInput.value.trim();
     const price = priceInput.value.trim();
 
-    // 1. 유효성 검사
     if (!name) {
         alert("메뉴명을 입력해 주세요.");
         nameInput.focus();
-        return; // 함수 종료
+        return;
     }
 
     if (!price || price <= 0) {
         alert("가격을 올바르게 입력해 주세요.");
         priceInput.focus();
-        return; // 함수 종료
+        return;
     }
 
-    // 2. 데이터 구성
-   
+    // 🔹 문화 카테고리
+    const cultureCategory = document.getElementById('CCSelect').value;
+
+    // 🔹 음식 분류 (여러 개)
+	const foodTypes = Array.from(
+	  document.querySelectorAll('input[name="foodType"]:checked')
+	)
+	.map(cb => cb.value)
+	.join(',');
+
+    // 🔹 음식 선택 (예: checkbox라 가정)
+	const selectedFood = document.querySelector(
+	    'input[name="selectedFood"]:checked'
+	)?.value || null;
+
     const menu = {
         group: group,
         id: <%=updateId%>,
         name: name,
         price: price,
-        img: (preview && !preview.endsWith('null') && !preview.endsWith('.jsp')) ? preview : 'noimage.png'
-    };    
-    menu.img = new URL(preview).pathname;
-    
-    // 3. 부모 창으로 데이터 전달 및 닫기
+        img: new URL(previewSrc).pathname,
+
+        cultureCategory: cultureCategory,
+        foodTypes: foodTypes,
+        foodItems: selectedFood
+    };
+
     window.opener.saveMenu(menu);
     window.close();
 }
@@ -143,6 +157,8 @@ function submitMenu() {
 	</div>
 	
 	<img id="preview" src="<%=menuImg%>">
+	
+	<jsp:include page="menuCategorySelector.jsp"></jsp:include>
 	
 	<br><br>
 	<button onclick="submitMenu()">완료</button>

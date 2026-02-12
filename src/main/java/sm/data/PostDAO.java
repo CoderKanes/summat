@@ -311,4 +311,68 @@ public class PostDAO {
 			this.type = type;
 		}
 	}
+	
+	
+	//post에 댓글을 작성하는 Method
+	public boolean insertComment(PostCommentDTO dto) {
+		boolean result = true;
+
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "insert into postComment (id, postNum, user_id, guestName, guestPassword, content, likeCount, dislikeCount, created_at, updated_at, replytarget) "
+					+ "values(postComment_seq.nextval,?,?,?,?, ?,0,0,sysdate,sysdate,?)";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, dto.getPostNum());
+			pstmt.setString(2, dto.getUser_Id());
+			pstmt.setString(3, dto.getGuestName());
+			pstmt.setString(4, dto.getGuestPassword());
+			pstmt.setString(5, dto.getContent());
+			pstmt.setInt(6, dto.getReplyTarget());
+
+			result = pstmt.executeUpdate() > 0;
+
+		} catch (Exception e) {
+			result = false;
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}
+	//post에 댓글을 작성하는 Method
+		public List<PostCommentDTO> getPostComments(int postNum) {
+			List<PostCommentDTO> result = new ArrayList<PostCommentDTO>();
+
+			try {
+				conn = OracleConnection.getConnection();
+				String sql = "select * from postComment where postNum=? order by created_at desc";
+
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, postNum);
+				rs = pstmt.executeQuery();
+
+				while (rs.next()) {
+					PostCommentDTO dto = new PostCommentDTO();
+					dto.setPostNum(rs.getInt("postNum"));				
+					dto.setUser_Id(rs.getString("user_id"));
+					dto.setGuestName(rs.getString("guestName")); 
+					dto.setGuestPassword(rs.getString("guestPassword"));
+					dto.setContent(rs.getString("content"));
+					dto.setLikeCount(rs.getInt("likeCount"));
+					dto.setDislikeCount(rs.getInt("dislikeCount"));
+					dto.setCreated_at(rs.getTimestamp("created_at"));	
+					dto.setUpdated_at(rs.getTimestamp("updated_at"));		
+					dto.setReplyTarget(rs.getInt("replytarget"));
+					
+				
+					result.add(dto);					
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				OracleConnection.closeAll(conn, pstmt, rs);
+			}
+			return result;
+		}
 }

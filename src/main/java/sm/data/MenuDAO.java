@@ -46,7 +46,7 @@ public class MenuDAO {
 		boolean result = true;
 		try {
 			conn = OracleConnection.getConnection();
-			String sql = "insert into menu (Id, storeId, groupNum, orderIdx, name, menu_desc, price, image) values(menu_seq.nextval, ?, ?, ?, ?, ?, ?, ?)";
+			String sql = "insert into menu (Id, storeId, groupNum, orderIdx, name, menu_desc, price, image, CCATEGORY_STR,FCATEGORY_STR, FOODITEM_STR ) values(menu_seq.nextval, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, dto.getStoreId());
 			pstmt.setInt(2, dto.getGroupNum());
@@ -55,7 +55,10 @@ public class MenuDAO {
 			pstmt.setString(5, dto.getMenu_desc());
 			pstmt.setInt(6, dto.getPrice());
 			pstmt.setString(7, dto.getImage());
-
+			pstmt.setString(8, dto.getCCategory_str());
+			pstmt.setString(9, dto.getFCategory_str());
+			pstmt.setString(10, dto.getFoodItem_str());
+			
 			result = pstmt.executeUpdate() > 0;
 
 		} catch (Exception e) {
@@ -115,7 +118,9 @@ public class MenuDAO {
 			    dto.setMenu_desc(rs.getString("menu_desc"));
 			    dto.setPrice(rs.getInt("price"));
 			    dto.setImage(rs.getString("image"));
-				
+			    dto.setCCategory_str(rs.getString("CCATEGORY_STR"));
+			    dto.setFCategory_str(rs.getString("FCATEGORY_STR"));
+			    dto.setFoodItem_str(rs.getString("FOODITEM_STR"));
 				result.add(dto);
 			}
 			
@@ -148,8 +153,10 @@ public class MenuDAO {
 			    dto.setName(rs.getString("name"));
 			    dto.setMenu_desc(rs.getString("menu_desc"));
 			    dto.setPrice(rs.getInt("price"));
-			    dto.setImage(rs.getString("image"));
-				
+			    dto.setImage(rs.getString("image"));			 
+			    dto.setCCategory_str(rs.getString("CCATEGORY_STR"));
+			    dto.setFCategory_str(rs.getString("FCATEGORY_STR"));
+			    dto.setFoodItem_str(rs.getString("FOODITEM_STR"));
 				result.add(dto);
 			}
 			
@@ -193,7 +200,8 @@ public class MenuDAO {
 		try {
 			conn = OracleConnection.getConnection();
 			
-			String sql = "update menu set groupNum = ?, orderIdx = ?, name = ? , menu_desc = ? , price = ? , image = ? WHERE storeId = ? and Id = ?";
+			String sql = "update menu set groupNum = ?, orderIdx = ?, name = ? , menu_desc = ? , price = ? , image = ? ,"
+					+ "WHERE storeId = ? and Id = ?";
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, dto.getGroupNum());
 			pstmt.setInt(2, dto.getOrderIdx());			

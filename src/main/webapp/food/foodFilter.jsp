@@ -13,8 +13,8 @@
 </style>
 
 <%
-	Map<String, Integer> cultureMap = MenuCategoryDAO.getInstance().getCultureCategoryMap();
-	Map<String, Integer> typeMap = MenuCategoryDAO.getInstance().getFoodTypeMap();
+	Map<String, Integer> cultureMap = MenuCategoryDAO.getInstance().getCultureCategoryReverseMap();
+	Map<String, Integer> typeMap = MenuCategoryDAO.getInstance().getFoodTypeReverseMap();
 	
     String culturesJson = String.join("','", cultureMap.keySet());
     String typesJson = String.join("','", typeMap.keySet());

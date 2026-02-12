@@ -3,8 +3,12 @@
 	pageEncoding="UTF-8"%>
 
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%@ page import="java.util.*"%>
 <%@ page import="java.util.Map"%>
+<%@ page import="java.util.List"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="sm.data.MenuDTO" %>
+<%@ page import="sm.data.MenuGroupDTO" %>
+<%@ page import="sm.util.FoodCategoryUtil" %>
 
 <%
 	String editParam = request.getParameter("Edit");
@@ -12,80 +16,24 @@
 	if(editParam != null ){
 		bEditMode = Boolean.parseBoolean(editParam);		
 	}
-
-/* ===== 더미 데이터 (Servlet 없이 JSP에서) ===== */
-class Menu {
-	int group;
-	int order;
-	int id;
-	String name;
-	int price;
-	String img;
-	
-}
-class Group {
-	int id;
-	String name;
-	int order;
-	List<Menu> menus = new ArrayList<>();
+List<FoodCategoryUtil.GroupViewData> viewDatas = null;
+String menuData = request.getParameter("menuData");
+if(menuData != null)
+{	
+	FoodCategoryUtil.MenuData data = FoodCategoryUtil.menuDataParse(menuData);	
+	viewDatas = data.GetGroupViewDatas();
 }
 
-List<Group> groups = null;
-String data = request.getParameter("menuData");
-if(data != null)
-{
-	String RS = "\\|\\|\\|"; // 정규식 escape 주의
-	String FS = ":::";
-	System.out.println(data);
-	Map<Integer, Group> groupMap = new LinkedHashMap<>();
-	List<Menu> tempMenuList = new ArrayList<>();
-	for (String rec : data.split(RS)) {
-	    String[] c = rec.split(FS, -1);
-	
-	    if ("G".equals(c[0])) {
-	        Group g = new Group();
-	        g.id = Integer.parseInt(c[1]);
-	        g.order = Integer.parseInt(c[2]);
-	        g.name = c[3];
-	        groupMap.put(g.id, g);
-	
-	    } else if ("M".equals(c[0])) {
-	        Menu m = new Menu();
-	        m.group = Integer.parseInt(c[1]);
-	        m.order = Integer.parseInt(c[2]);
-	        m.id = Integer.parseInt(c[3]);
-	        m.name = c[4];
-	        m.price = Integer.parseInt(c[5]);
-	        m.img = c[6];
-	
-	        tempMenuList.add(m);
-	    }
+if(viewDatas==null || viewDatas.size() == 0){
+	if(viewDatas==null)	{
+		viewDatas = new ArrayList<FoodCategoryUtil.GroupViewData>();
 	}
-	for (Menu m : tempMenuList) {
-	    Group g = groupMap.get(m.group);
-	    if (g != null) {
-	        g.menus.add(m);
-	    } else {
-	        // 끝까지 그룹 정보가 없는 경우에 대한 처리 (선택사항)
-	        System.out.println("매칭되는 그룹 없음: " + m.group);
-	    }
-	}
-
-	groups = new ArrayList<>(groupMap.values());
-
-}
-else
-{
-	groups = new ArrayList<>();
-}
-
-if(groups.size() == 0)
-{ 
-	Group g = new Group();
-	g.id = 0;
-	g.order = 0;
-	g.name = "메뉴";
-	groups.add(g);
+	FoodCategoryUtil.GroupViewData v = new FoodCategoryUtil.GroupViewData();
+	v.group = new MenuGroupDTO();
+	v.group.setNum(0);
+	v.group.setOrderIdx(0);
+	v.group.setName("메뉴");
+	viewDatas.add(v);
 }
 
 //List<Group> groups = new ArrayList<>();
@@ -265,9 +213,9 @@ body {
 	<div class="group-container" id="groupList">
 
 		<%
-		for (Group g : groups) {
+		for (FoodCategoryUtil.GroupViewData vdata : viewDatas) {
 		%>
-		<div class="group" data-group-id="<%=g.id%>">
+		<div class="group" data-group-id="<%=vdata.group.getNum()%>">
 			<% if(bEditMode){%>
 			<div class="group-header-edit" ondblclick="editGroupName(this)"				
 				oncontextmenu="groupAction(event,this)"
@@ -276,7 +224,7 @@ body {
 			<% }else{%>
 			<div class="group-header">
 			<% } %>
-				<span class="group-title"><%=g.name%></span>
+				<span class="group-title"><%=vdata.group.getName()%></span>
 				<% if(bEditMode){%>
 				<button onclick="addMenu(this)">+ 메뉴</button>
 				<% } %>
@@ -284,19 +232,19 @@ body {
 
 			<div class="menu-list">
 				<%
-				for (Menu m : g.menus) {
+				for (MenuDTO m : vdata.menus) {
 				%>
-				<div class="menu" data-menu-id="<%=m.id%>">
+				<div class="menu" data-menu-id="<%=m.getId()%>">
 					<% if(bEditMode){%>
 					<div class="drag-handle">≡</div>					
-					<div class="menu-body" onclick="menuEditAction(<%=m.id%>)">
+					<div class="menu-body" onclick="menuEditAction(<%=m.getId()%>)">
 					<% }else{ %>
-					<div class="menu-body" onclick="menuClicked(<%=m.id%>)">
+					<div class="menu-body" onclick="menuClicked(<%=m.getId()%>)">
 					<% } %>
-						<div class="menu-name"><%=m.name%></div>
-						<div class="menu-price"><%=m.price%>원</div>
+						<div class="menu-name"><%=m.getName()%></div>
+						<div class="menu-price"><%=m.getPrice()%>원</div>
 					</div>
-						<img class="menu-img" src="<%=m.img%>">
+						<img class="menu-img" src="<%=m.getImage()%>">
 					</div>
 				<%
 				}
@@ -507,7 +455,11 @@ function saveEdit() {
 	      const name = menuEl.querySelector('.menu-name')?.innerText.trim() || '';
 	      const price = menuEl.querySelector('.menu-price')?.innerText.replace('원', '') || '0';
 	      const img = menuEl.querySelector('.menu-img')?.getAttribute('src') || '';
-	      records.push(['M', groupId, mOrder, menuId, name, price, img].join(FS));
+	      const desc = menuEl.querySelector('.menu-desc')?.innerText.trim() || '';
+	      const culture = menuEl.dataset.culture || '';
+	      const foodTypes = menuEl.dataset.foodTypes || '[]';
+	      const foodItem = menuEl.dataset.foodItem || '';
+	      records.push(['M', groupId, mOrder, menuId, name, price, img, desc, culture, foodTypes, foodItem].join(FS));
 	    });
 	  });
 
@@ -592,6 +544,10 @@ function saveMenu(menu) {
     if (priceEl) priceEl.innerText = menu.price + '원';
     if (imgEl && menu.img) imgEl.setAttribute('src', menu.img);
 
+    menuEl.dataset.culture = menu.cultureCategory || '';
+    menuEl.dataset.foodTypes = menu.foodTypes || '';//JSON.stringify(menu.foodTypes || []);
+    menuEl.dataset.foodItem = menu.foodItems || '';
+    
     return;
   }
 
@@ -601,6 +557,9 @@ function saveMenu(menu) {
   var m = document.createElement('div');
   m.className = 'menu';
   m.setAttribute('data-menu-id', menu.id);
+  m.dataset.culture = menu.cultureCategory || '';
+  m.dataset.foodTypes =  menu.foodTypes || '';//JSON.stringify(menu.foodTypes || []);
+  m.dataset.foodItem = menu.foodItems || '';
 
   m.innerHTML =
     '<div class="drag-handle">≡</div>' +
