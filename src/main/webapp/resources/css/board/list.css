@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+.board-list-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.board-list-search {
+  margin-bottom: 14px;
+}
+
+.board-list-empty {
+  text-align: center;
+}
+
+.board-list-actions {
+  margin-top: 12px;
+}
+
+.board-list-title-link {
+  color: var(--color-point-strong);
+  text-decoration: none;
+}
+
+.board-list-title-link:hover {
+  text-decoration: underline;
+}
