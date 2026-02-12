@@ -65,10 +65,8 @@
 
   	// 탈퇴 확인 및 이동 예시
   	function withdraw() {
-    	if (confirm('정말로 탈퇴하시겠습니까? 탈퇴 시 계정 정보가 삭제됩니다.')) {
       	// 실제 탈퇴 경로로 이동
-      		window.location.href = 'deleteForm.jsp'; // 실제 경로로 수정
-    	}
+      	window.location.href = 'deleteForm.jsp'; // 실제 경로로 수정
   	}
 </script>
 </head>

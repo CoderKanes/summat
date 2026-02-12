@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import sm.util.PasswordUtil;
@@ -347,6 +348,193 @@ public class AdminDAO {
             OracleConnection.closeAll(conn, pstmt, rs);
         }
         return result;
-    }
+    }//해시 솔트 비교 end
+	
+	//상태에 따른 숫자
+	public int getCountByStatus(String status, String searchQuery) {
+		int result = 0;
+		try {
+			conn = OracleConnection.getConnection();
+			 StringBuilder sb = new StringBuilder();
+		        sb.append("select count(*) as count from members where user_status = ?");
+		        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+		            sb.append(" and (user_id = ? or username = ?)");
+		        }
+		        pstmt = conn.prepareStatement(sb.toString());
+		        pstmt.setString(1, status);
+		        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+		            String q = "%" + searchQuery + "%";
+		            pstmt.setString(2, q);
+		            pstmt.setString(3, q);
+		        }
+		        rs = pstmt.executeQuery();
+		        if (rs.next()) {
+		        	result = rs.getInt("count");
+		        }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		return result;
+	}//end
+	
+	//이메일 인증 카운트
+	public int getEmailVerifiedCount(String searchQuery) {
+	    int count = 0;
+	    try {
+	        conn = OracleConnection.getConnection();
+	        StringBuilder sb = new StringBuilder();
+	        sb.append("select count(*) as count from members where email_verified = 1");
+	        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+	            sb.append(" and (user_id like ? or username like ?)");
+	        }
+	        pstmt = conn.prepareStatement(sb.toString());
+	        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+	            String q = "%" + searchQuery + "%";
+	            pstmt.setString(1, q);
+	            pstmt.setString(2, q);
+	        }
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) count = rs.getInt("count");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        OracleConnection.closeAll(conn, pstmt, rs);
+	    }
+	    return count;
+	}//end
+	
+	//연령대 성별 집게 
+	public StatsDTO getStats(String searchQuery) {
+		StatsDTO sdto = new StatsDTO();
+		try {
+			conn = OracleConnection.getConnection();
+			StringBuilder sb = new StringBuilder();
+			//db 전체 가져와 그리고 별칭 total붙여
+			sb.append("select count(*) as total, ")
+			//					   1(주민번호 앞이 6자리 + '-' + 뒷자리 첫 수가 0아니지?) 											  2(주민번호 - 지워)										 3(뒷자리 1번만 꺼내)				 4(그게 13579냐?)	  (참 = 1, 거짓 = 0)이고 남자에 저장해
+			.append("sum(case when regexp_like(resident_registration_number, '^[0-9]{6}[-]?[1-9]') and to_number(regexp_substr(regexp_replace(resident_registration_number,'-',''), '.{6}(.{1})', 1, 1, NULL, 1)) in (1,3,5,7,9) then 1 else 0 end) as male, ")
+	        .append("sum(case when regexp_like(resident_registration_number, '^[0-9]{6}[-]?[1-9]') and to_number(regexp_substr(regexp_replace(resident_registration_number,'-',''), '.{6}(.{1})', 1, 1, NULL, 1)) in (2,4,6,8,0) then 1 else 0 end) as female, ")
+	        //형식이 안 맞으면 이거
+	        .append("sum(case when not regexp_like(resident_registration_number, '^[0-9]{6}[-]?[1-9]') then 1 else 0 end) as unknown_gender, ")
+	        //날짜 비교
+	        .append("sum(case when (floor(months_between(sysdate, to_date( ")
+	        .append("CASE ")
+	        .append(" WHEN length(regexp_replace(resident_registration_number,'-','')) >= 7 THEN ") // 안전하게 처리
+	        .append("   CASE ")
+	        .append("     WHEN to_number(substr(regexp_replace(resident_registration_number,'-',''),7,1)) IN (1,2) THEN to_char(to_date(substr(regexp_replace(resident_registration_number,'-',''),1,6),'YYMMDD') + interval '100' year, 'YYYYMMDD') ")
+	        .append("     WHEN to_number(substr(regexp_replace(resident_registration_number,'-',''),7,1)) IN (3,4) THEN to_char(to_date(substr(regexp_replace(resident_registration_number,'-',''),1,6),'YYMMDD') , 'YYYYMMDD') ")
+	        .append("     WHEN to_number(substr(regexp_replace(resident_registration_number,'-',''),7,1)) IN (5,6,7,8,9,0) THEN to_char(to_date(substr(regexp_replace(resident_registration_number,'-',''),1,6),'YYMMDD') , 'YYYYMMDD') ")
+	        .append("     ELSE NULL ")
+	        .append("   END ")
+	        .append(" ELSE NULL END), 'J')/365) between 0 and 9 then 1 else 0 end) as age_0_9, ")
+	        .append("0 as age_10_19, 0 as age_20_29, 0 as age_30_39, 0 as age_40_49, 0 as age_50_59, 0 as age_60_plus ")
+	        .append("from members ");
+
+	        String sql = "select resident_registration_number from members";
+	        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+	            sql += " where user_id like ? or username like ?";
+	        }
+	        pstmt = conn.prepareStatement(sql);
+	        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+	            String q = "%" + searchQuery + "%";
+	            pstmt.setString(1, q);
+	            pstmt.setString(2, q);
+	        }
+	        rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            String rrn = rs.getString("resident_registration_number");
+	            if (rrn == null) {
+	                sdto.unknownGender++;
+	                continue;
+	            }
+	            String normalized = rrn.replaceAll("[^0-9]", ""); 
+	            if (normalized.length() < 7) {
+	                sdto.unknownGender++;
+	                continue;
+	            }
+	            String yy = normalized.substring(0, 2);
+	            String mm = normalized.substring(2, 4);
+	            String dd = normalized.substring(4, 6);
+	            char genderChar = normalized.charAt(6);
+	            int genderDigit = Character.isDigit(genderChar) ? Character.getNumericValue(genderChar) : -1;
+
+	            int year = 0;
+	            int yyNum = Integer.parseInt(yy);
+	            if (genderDigit == 1 || genderDigit == 2) {
+	                // 1900s (born 1900-1999)
+	                year = 1900 + yyNum;
+	            } else if (genderDigit == 3 || genderDigit == 4) {
+	                // 2000s (born 2000-2099)
+	                year = 2000 + yyNum;
+	            } else if (genderDigit == 5 || genderDigit == 6) {
+	                // foreigner assigned -> usually 1900s
+	                year = 1900 + yyNum;
+	            } else {
+	                // fallback
+	                year = 1900 + yyNum;
+	            }
+
+	            int month = 1;
+	            int day = 1;
+	            try {
+	                month = Integer.parseInt(mm);
+	                day = Integer.parseInt(dd);
+	            } catch (Exception ex) {
+	                // ignore, keep defaults
+	            }
+
+	            Calendar birth = Calendar.getInstance();
+	            birth.setLenient(false);
+	            birth.set(year, month - 1, day, 0, 0, 0);
+	            Calendar now = Calendar.getInstance();
+
+	            int age = now.get(Calendar.YEAR) - birth.get(Calendar.YEAR);
+	            if (now.get(Calendar.MONTH) < birth.get(Calendar.MONTH) ||
+	                (now.get(Calendar.MONTH) == birth.get(Calendar.MONTH) &&
+	                 now.get(Calendar.DAY_OF_MONTH) < birth.get(Calendar.DAY_OF_MONTH))) {
+	                age--;
+	            }
+
+	            // increment totals
+	            sdto.total++;
+
+	            // gender
+	            if (genderDigit == 1 || genderDigit == 3 || genderDigit == 5 || genderDigit == 7 || genderDigit == 9) {
+	                sdto.male++;
+	            } else if (genderDigit == 2 || genderDigit == 4 || genderDigit == 6 || genderDigit == 8 || genderDigit == 0) {
+	                sdto.female++;
+	            } else {
+	                sdto.unknownGender++;
+	            }
+
+	            // age buckets
+	            if (age < 0) {
+	                // ignore negative ages
+	            } else if (age <= 9) {
+	                sdto.age0_9++;
+	            } else if (age <= 19) {
+	                sdto.age10_19++;
+	            } else if (age <= 29) {
+	                sdto.age20_29++;
+	            } else if (age <= 39) {
+	                sdto.age30_39++;
+	            } else if (age <= 49) {
+	                sdto.age40_49++;
+	            } else if (age <= 59) {
+	                sdto.age50_59++;
+	            } else {
+	                sdto.age60_plus++;
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        OracleConnection.closeAll(conn, pstmt, rs);
+	    }
+		return sdto;
+	}//end
 	
 }//AdminDAO end
