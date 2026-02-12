@@ -1,7 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
+<%--
+	작성자 : 신동엽
+	내용 : 게시글 작성 페이지
+	       - 게시글 제목, 작성자, 내용 입력 폼 제공
+	       - 작성 완료 시 writeProc.jsp로 데이터 전송
+ --%>
 
-<!DOCTYPE html>
+
+
 <html>
 <head>
 <meta charset="UTF-8">
@@ -36,7 +44,7 @@
 
 <body>
 
-<h2 align="center">글 작성</h2>
+<h2 align="center">글 작성</h2> 
 
 <form action="writeProc.jsp" method="post">
     <table>
@@ -46,28 +54,15 @@
                 <input type="text" name="title" required>
             </td>
         </tr>
-
-		<%
-		String id = (String)session.getAttribute("sid");
-		if(id==null){ %>
+        
         <tr>
-            <th>작성자</th>
+  <th>작성자</th>
             <td>
                 <input type="text" name="writer" required>
             </td>
         </tr>
-		<%}else{%>
-
         <tr>
-            <th>작성자ID</th>
-            <td>
-                <input type="text" name="id" required>
-            </td>
-        </tr>
-		<%}%>
-
-
-        <tr>
+        
             <th>내용</th>
             <td>
                 <textarea name="content" rows="10" required></textarea>
