@@ -202,7 +202,7 @@
 		</div>
 		
 		<div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:800px; margin-bottom:12px;">
-  			<button type="button" class="btn secondary" onclick="goMain()">메인으로 돌아가기</button>
+  			<button type="button" class="btn secondary" onclick="goMain()">뒤로</button>
 		</div>
 	</form>
 </div>
@@ -222,7 +222,7 @@
 	}
 	
 	function openVerify() {
-		var email = document.getElementBiId('email').value.trim();
+		var email = document.getElementById('email').value.trim();
 		if(!email){
 			window.location.href='verifyEmailForm.jsp';
 		}else{
@@ -231,7 +231,7 @@
 	}
 	
 	function goMain() {
-		window.location.href='/summat/sm/main.jsp';
+		window.location.href='mypage.jsp';
 	}
 	
 </script>

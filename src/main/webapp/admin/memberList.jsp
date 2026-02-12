@@ -170,6 +170,12 @@
         <button type="submit" class="btn">적용</button>
       </form>
     </div>
+    
+     <!-- 추가: 관리자 페이지 버튼 (오른쪽 끝) -->
+    <div class="section" style="border-right: none; margin-left: auto;">
+      <button type="button" class="btn" onclick="location.href='dashboard.jsp'">관리자 페이지</button>
+    </div>
+    
   </div>
 	
 	<table>

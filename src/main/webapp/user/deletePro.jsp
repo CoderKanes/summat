@@ -12,12 +12,12 @@
 <%
 	//파라메터 받기
 	String user_id = request.getParameter("user_id");
-	String password_hash = request.getParameter("password_hash");
+	String plainPassword = request.getParameter("password");
 	
 	//DTO생성 및 값 입력
 	MemberDTO dto = new MemberDTO();
 	dto.setUser_id(user_id);
-	dto.setPassword_hash(password_hash);
+	dto.setPassword_hash(plainPassword);
 	
 	//메세지 및 페이지 저장 변수 
 	String msg;
