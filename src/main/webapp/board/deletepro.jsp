@@ -10,17 +10,33 @@
 	       - 삭제 완료 후 게시글 목록 페이지(list.jsp)로 이동
  --%>
 <%
-    // 1️⃣ 글 번호 받기
-    String numStr = request.getParameter("num");
+request.setCharacterEncoding("UTF-8");
 
-    if(numStr != null) {
-        int num = Integer.parseInt(numStr);
+// 1️⃣ 글 번호 받기
+String numStr = request.getParameter("num");
+String password = request.getParameter("password");
 
-        // 2️⃣ DAO 실행
-        BoardDAO dao = new BoardDAO();
-        dao.deleteBoard(num);
-    } 
+if(numStr != null && password != null) {
 
-    // 3️⃣ 목록으로 이동
+    int num = Integer.parseInt(numStr);
+
+    BoardDAO dao = new BoardDAO();
+
+    // num + password 기준 삭제
+    boolean deleted = dao.deleteComment(num, password);
+
+    if(deleted) {
+        response.sendRedirect("list.jsp");
+    } else {
+%>
+        <script>
+            alert("비밀번호가 틀렸습니다.");
+            history.back();
+        </script>
+<%
+    }
+
+} else {
     response.sendRedirect("list.jsp");
+}
 %>

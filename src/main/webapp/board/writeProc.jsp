@@ -14,9 +14,11 @@
     dto.setTitle(request.getParameter("title"));    // 제목
     dto.setWriter(request.getParameter("writer"));  // 작성자
     dto.setContent(request.getParameter("content"));// 내용
+    dto.setPassword(request.getParameter("password")); // ✅ 여기 중요
     // dto.setId(Integer.parseInt(request.getParameter("id"))); 나중에 할 일
     BoardDAO dao = new BoardDAO();
     int result = dao.insert(dto);
+    
     response.sendRedirect("list.jsp");
 		
     %>

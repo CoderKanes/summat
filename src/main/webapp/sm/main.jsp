@@ -94,8 +94,7 @@
 		☰
 		<div class="search">검색바</div>
 
-		<!-- 헤더 글쓰기 -->
-		<button class="icon-btn" onclick="writePost()">✏️</button>
+
 		<!-- 로그인 여부에 따라 버튼 변경 -->
 		<% if (isAuth) { %>  
 			<% if (grade == 0) { %>  
@@ -113,7 +112,7 @@
 			<li class="active">홈</li>
 			<a href="/summat/food/foodMain.jsp" style="text-decoration: none;"><li>음식정보</li></a>
 			<a href="/summat/post/postMain.jsp" style="text-decoration: none;"><li>포스트</li></a>
-			<a href="/summat/sm/board/list.jsp" style="text-decoration: none;"><li>커뮤니티</li></a>
+			<a href="/summat/board/list.jsp" style="text-decoration: none;"><li>커뮤니티</li></a>
 		</ul>
 	</nav>
 

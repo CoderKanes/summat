@@ -9,6 +9,7 @@
 --%>
 <%
     // 1️ 요청 파라미터에서 게시글 번호(num) 가져오기
+    
     String numStr = request.getParameter("num");
     int num = 0;
     // 2️ 게시글 번호가 전달된 경우 정수로 변환

@@ -68,8 +68,8 @@ public class BoardDAO {
 	public int insert(BoardDTO dto) {
 
 		int result = 0;
-		String sql = "INSERT INTO board (id, num, title, content, writer, regdate, hit) "
-				+ "VALUES (?, board_seq.NEXTVAL, ?, ?, ?, SYSDATE, 0)";
+		String sql = "INSERT INTO board (id, num, title, content, writer, password, regdate, hit) "
+				+ "VALUES (?, board_seq.NEXTVAL, ?, ?, ?, ?, SYSDATE, 0)";
 
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -77,9 +77,12 @@ public class BoardDAO {
 			ps.setString(2, dto.getTitle());
 			ps.setString(3, dto.getContent());
 			ps.setString(4, dto.getWriter());
-
+			ps.setString(5, dto.getPassword());
 			result = ps.executeUpdate();
 
+		     // 👇 여기 추가
+	        System.out.println("password = " + dto.getPassword());
+			
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
@@ -199,14 +202,20 @@ public class BoardDAO {
 		}
 	}
 	// 6 -1 댓글 삭제 기능 
-	public boolean deleteComment(int id) {
-	    String sql = "DELETE FROM BOARD_COMMENT WHERE id=?";
+	public boolean deleteComment(int id, String password) {
+		
+		 String sql = "DELETE FROM board WHERE id=? AND password=?";
+		 
 	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-	        ps.setInt(1, id);
+	    	ps.setInt(1, id);
+	    	ps.setString(2, password);
+	    	
 	        int result = ps.executeUpdate();
 	        return result > 0;
+	        
 	    } catch(Exception e) {
 	        e.printStackTrace();
+	        
 	        return false;
 	    }
 	}

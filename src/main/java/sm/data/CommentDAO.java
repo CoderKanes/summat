@@ -84,9 +84,8 @@ public class CommentDAO {
 		
 		try {
 			PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM BOARD_COMMENT WHERE board_num=?");
-			
+			ps.executeQuery();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -104,18 +103,23 @@ public class CommentDAO {
 	}
 
     // 3. 댓글 삭제
-    public boolean deleteComment(String writer ,String password) {
-        String sql = "DELETE FROM BOARD_COMMENT WHERE writer=? and password=?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, writer);
-            ps.setString(2, password);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+	public boolean deleteComment(int id, String password) {
 
+	    String sql = "DELETE FROM board_comment WHERE id=? AND password=?";
+	   
+	    try (PreparedStatement ps = conn.prepareStatement(sql)){
+	    	ps.setInt(1, id);
+	    	ps.setString(2, password);
+
+	        int result = ps.executeUpdate();
+	        return result > 0;
+
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return false;
+	}
     // 4. 댓글 수정
     public boolean updateComment(int id, String content) {
         String sql = "UPDATE BOARD_COMMENT SET content=? WHERE id=?";

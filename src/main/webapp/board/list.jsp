@@ -6,6 +6,7 @@
 
 <link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
 <%--
+
 	작성자 : 신동엽
 	내용 : 게시글 목록 페이지
 	       - 게시글 전체 목록 조회
@@ -25,17 +26,38 @@
 	       - 8. 
  --%>
  
+<script>
+function deleteComment(commentId) {
+
+    var password = prompt("비밀번호를 입력하세요");
+
+    // 취소 눌렀을 때
+    if (password == null) {
+        return;
+    }
+
+    // 비밀번호 안 썼을 때
+    if (password.trim() === "") {
+        alert("비밀번호를 .");
+        return;
+    }
+
+    // 삭제 페이지로 이동
+    location.href = 
+        "deletepro.jsp?id=" + commentId + 
+        "&password=" + encodeURIComponent(password);
+}
+</script>
+
 <html>
+<h2><a href="list.jsp?">게시글 목록</a></h2>
+
 <head>
 <meta charset="UTF-8">
 <!-- HTML 인코딩 -->
-<h2>
-    <a href="list.jsp?">게시글 목록</a>
-</h2>
 </head>
 <body>
 	
-
 	<!-- 1 검색 폼 -->
 	<form method="get" action="list.jsp">
 		<input type="text" name="keyword" placeholder="검색어 입력"
@@ -97,7 +119,8 @@
 
 <!-- -----4. 리스트 글 목록 ---------> 
 
-<table border="1" width="100%" cellpadding="0" cellspacing="0" align="center">
+<table border="1" style="width:100%; border-collapse:collapse; margin:auto;">
+
 			<tr height="30">
 			<th>번호</th>
 			<th>제목</th>
@@ -125,10 +148,11 @@ if( list != null && !list.isEmpty() ) {
 
 <!-- ----7. 댓글 수 조회------>    
 			<td><%= cdao.getCommentCountByBoardNum(board.getNum()) %></td>
-<!------삭제 ------>
-			<td><a href="deletepro.jsp?num=<%=board.getNum()%>"
-				onclick="return confirm('삭제하시겠습니까?');">삭제</a></td>
-		</tr>
+
+			<td>
+			<a href="#"onclick="deletepro.jsp(<%= board.getNum() %>); return false;">삭제</a>
+			</td>   
+			</tr>
 		
 		<%   } 
        cdao.close();
