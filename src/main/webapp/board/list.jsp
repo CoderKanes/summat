@@ -4,7 +4,8 @@
 <%@ page import="sm.data.BoardDTO, sm.data.BoardDAO, sm.data.CommentDAO"%>
 <%@ page import="java.util.*"%>
 
-<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
+<link href="/summat/resources/css/style.css" rel="stylesheet" />
+<link href="/summat/resources/css/board/list.css" rel="stylesheet" />
 <%--
 
 	작성자 : 신동엽
@@ -50,7 +51,7 @@ function deleteComment(commentId) {
 </script>
 
 <html>
-<h2><a href="list.jsp?">게시글 목록</a></h2>
+<h2 class="page-title"><a class="link-plain" href="list.jsp?">게시글 목록</a></h2>
 
 <head>
 <meta charset="UTF-8">
@@ -59,10 +60,11 @@ function deleteComment(commentId) {
 <body>
 	
 	<!-- 1 검색 폼 -->
-	<form method="get" action="list.jsp">
+	<div class="board-list-wrap">
+	<form class="board-list-search form-inline" method="get" action="list.jsp">
 		<input type="text" name="keyword" placeholder="검색어 입력"
-			value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>">
-		<input type="submit" value="검색">
+			value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>" class="input-base">
+		<input type="submit" value="검색" class="button-base">
 	</form>
 	
 	<!------2 JSP 선언부 (전역 변수 / 유틸 메서드)---->
@@ -119,7 +121,7 @@ function deleteComment(commentId) {
 
 <!-- -----4. 리스트 글 목록 ---------> 
 
-<table border="1" style="width:100%; border-collapse:collapse; margin:auto;">
+<table class="table-base">
 
 			<tr height="30">
 			<th>번호</th>
@@ -140,7 +142,7 @@ if( list != null && !list.isEmpty() ) {
 <!-- ---------6. 게시글 한 줄 출력--------->    
 		<tr>
 			<td><%= board.getNum() %></td>
-			<td><a href="view.jsp?num=<%= board.getNum() %>"> <%= board.getTitle() %>
+			<td><a class="board-list-title-link" href="view.jsp?num=<%= board.getNum() %>"> <%= board.getTitle() %>
 			</a></td>
 			<td><%= board.getWriter() %></td>
 			<td><%= board.getRegDate() %></td>
@@ -158,14 +160,16 @@ if( list != null && !list.isEmpty() ) {
        cdao.close();
    } else { %>
 		<tr>
-			<td colspan="7" align="center">게시글이 없습니다.</td>
+			<td colspan="7" class="board-list-empty">게시글이 없습니다.</td>
 		</tr>
 		<% } %>
 
 	</table>
 <!------글쓰기 버튼 영역---->
 	<br>
-	<input type="button" value="글쓰기" onclick="location.href='write.jsp'">
+	<div class="board-list-actions">
+		<input type="button" value="글쓰기" class="button-base" onclick="location.href='write.jsp'">
+	</div>
 
 	<!------페이지 계산 ---->
 	<!--페이지 총 글자수 계산 1페이지에서 보여줄 갯수 확인-->
@@ -214,5 +218,6 @@ if (count > 0) {
 	}
 }
 %>
+</div>
 </body>
 </html>

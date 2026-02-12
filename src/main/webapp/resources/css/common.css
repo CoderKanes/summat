@@ -1,0 +1,102 @@
+@charset "UTF-8";
+
+:root {
+  --color-bg-page: #f4f2ee;
+  --color-bg-surface: #ffffff;
+  --color-bg-muted: #f8f5f0;
+  --color-text-primary: #2e2a27;
+  --color-text-secondary: #6e655f;
+  --color-border: #ddd3c8;
+  --color-point: #c97826;
+  --color-point-strong: #a85f15;
+  --color-point-soft: #f4e4d3;
+}
+
+body {
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+}
+
+a {
+  color: inherit;
+}
+
+.link-plain {
+  text-decoration: none;
+}
+
+.page-title {
+  margin: 16px 0;
+}
+
+.text-point {
+  color: var(--color-point);
+}
+
+.card-surface {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.form-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-base,
+.select-base,
+.button-base {
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.input-base,
+.select-base {
+  padding: 8px 10px;
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.button-base {
+  padding: 8px 14px;
+  cursor: pointer;
+  background: var(--color-point);
+  color: #fff;
+  border-color: var(--color-point);
+}
+
+.button-base:hover {
+  background: var(--color-point-strong);
+  border-color: var(--color-point-strong);
+}
+
+.table-base {
+  width: 100%;
+  border-collapse: collapse;
+  margin: auto;
+  background: var(--color-bg-surface);
+}
+
+.table-base th,
+.table-base td {
+  border: 1px solid var(--color-border);
+  padding: 10px;
+  text-align: center;
+}
+
+.table-base th {
+  background: var(--color-bg-muted);
+}
+
+.paging-wrap {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.paging-current {
+  color: var(--color-point-strong);
+  font-weight: 700;
+}

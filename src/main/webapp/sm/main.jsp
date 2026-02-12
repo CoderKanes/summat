@@ -10,7 +10,8 @@
 <html lang="ko">
 <head>
 	<title>맛집 페이지 테마 샘플</title>
-	<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
+	<link href="/summat/resources/css/style.css" rel="stylesheet" />
+	<link href="/summat/resources/css/sm/main.css" rel="stylesheet" />
 <%
 	int grade = 1;
 	// 세션에 grade가 있으면 안전하게 읽기
@@ -103,9 +104,9 @@
 	<nav class="top-nav">
 		<ul>
 			<li class="active">홈</li>
-			<a href="/summat/food/foodMain.jsp" style="text-decoration: none;"><li>음식정보</li></a>
-			<a href="/summat/post/postMain.jsp" style="text-decoration: none;"><li>포스트</li></a>
-			<a href="/summat/board/list.jsp" style="text-decoration: none;"><li>커뮤니티</li></a>
+			<a href="/summat/food/foodMain.jsp" class="top-nav-link"><li>음식정보</li></a>
+			<a href="/summat/post/postMain.jsp" class="top-nav-link"><li>포스트</li></a>
+			<a href="/summat/board/list.jsp" class="top-nav-link"><li>커뮤니티</li></a>
 		</ul>
 	</nav>
 

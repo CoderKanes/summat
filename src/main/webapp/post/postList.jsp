@@ -13,7 +13,7 @@
     	paging 값이나 검색관련 param이 있으면 그에 맞게 list를 구성
 --%>
 
-<link href="/summat/resources/css/style.css" style="text/css" rel="stylesheet" />
+<link href="/summat/resources/css/style.css" rel="stylesheet" />
 
 
 <%	
@@ -89,7 +89,7 @@
 				pageUrl = request.getRequestURI() + "?" +queryString+ "&";
 			}
 		}		
-		%><div class="paging-wrap" style="text-align: center"><%
+		%><div class="paging-wrap"><%
 		if (currentPage - 5 >= 1) {
 		%><a href="<%=pageUrl%>pageNum=<%=currentPage-5%>">[<<] </a><%
 		}
@@ -98,7 +98,7 @@
 		}
 		for (int i = pageNav_StartPage ; i <= pageNav_EndPage ; i++) {
 			if(i == currentPage){
-			%><a href="<%=pageUrl%>pageNum=<%= i %>"><font color="#b84a4a">[<%= i %>]</font></a>	<%
+			%><a href="<%=pageUrl%>pageNum=<%= i %>"><span class="paging-current">[<%= i %>]</span></a>	<%
 			}else{
 			%><a href="<%=pageUrl%>pageNum=<%= i %>">[<%= i %>]</a>	<%
 			}
