@@ -52,45 +52,66 @@ header {
 }
 /* ===== TOP NAV ===== */
 .top-nav {
-	background: var(--side-bg);
-	border-bottom: 1px solid #ddd;
+    background: var(--side-bg);
+    border-bottom: 1px solid #ddd;
 }
 
 .top-nav ul {
-	display: flex;
-	margin: 0;
-	padding: 0 20px;
-	list-style: none;
-	gap: 24px;
-	height: 50px;
-	align-items: center;
+    display: flex;
+    margin: 0;
+    padding: 0 20px;
+    list-style: none;
+    gap: 24px;
+    height: 50px;
+    align-items: stretch; /* 높이를 꽉 채우도록 변경 */
 }
 
+/* li 자체의 패딩을 제거하고 a 태그에 위임하여 클릭 영역 확장 */
 .top-nav li {
-	cursor: pointer;
-	font-weight: 600;
-	color: #555;
-	padding: 8px 4px;
-	position: relative;
+    display: flex;
+    align-items: center;
+    position: relative;
 }
 
-.top-nav li:hover {
-	color: var(--point);
+.top-nav a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 4px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #555 !important; /* 기본 글자색 강제 */
+    cursor: pointer;
 }
 
-.top-nav li.active {
-	color: var(--point);
+/* 방문 링크 보라색 방지 및 호버/액티브 설정 */
+.top-nav a:visited {
+    color: #555 !important;
 }
 
+.top-nav li:hover a,
+.top-nav li.active a,
+.top-nav li.active a:visited {
+    color: var(--point) !important;
+}
+
+
+/* 하단 바 (기존 스타일 유지) */
 .top-nav li.active::after {
-	content: "";
-	position: absolute;
-	left: 0;
-	bottom: -10px;
-	width: 100%;
-	height: 3px;
-	background: var(--point);
-	border-radius: 2px;
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0; 
+    width: 100%;
+    height: 3px;
+    background: var(--point);
+    border-radius: 2px;
+}
+
+
+/* 마우스를 올렸을 때나 클릭했을 때도 색상이 변하지 않게 하려면 아래도 추가 */
+.top-nav a:visited {
+    color: inherit;
 }
 /* ===== LAYOUT ===== */
 .container {

@@ -13,8 +13,8 @@
 <title>Insert title here</title>
 </head>
 <body>
-
-	 <jsp:include page="postSearch.jsp" />	 
+	<jsp:include page="/main/topBar.jsp"></jsp:include>
+	<jsp:include page="postSearch.jsp" />	 
 
 </body>
 </html>

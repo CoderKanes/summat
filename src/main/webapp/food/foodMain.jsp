@@ -167,6 +167,8 @@ body {
 	}
 %>
 
+	<jsp:include page="/main/topBar.jsp"></jsp:include>
+	
 	<%if (foodMap != null) {
 		for (Map.Entry<String, List<FoodVeiwData>> entry : foodMap.entrySet()) { %>
 			<div class="section">

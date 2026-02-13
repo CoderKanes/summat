@@ -52,5 +52,5 @@
 <%}else{%>
 	alert("등록완료. 관리자 승인후 게재됩니다.");
 <%}%>
-location.href = '/summat/sm/main.jsp';
+location.href = '/summat/main/main.jsp';
 </script>

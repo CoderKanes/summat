@@ -37,7 +37,7 @@
 
 				<div class="error-actions">
 					<button onclick="history.back()">이전 페이지</button>
-					<button class="primary" onclick="location.href='/summat/sm/main.jsp'">
+					<button class="primary" onclick="location.href='/summat/main/main.jsp'">
 						홈으로 가기
 					</button>
 				</div>

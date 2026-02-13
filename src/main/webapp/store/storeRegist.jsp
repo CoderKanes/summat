@@ -187,7 +187,7 @@ function editMenus() {
 	    <br>
 	    
 		<input type="submit" value ="등록신청">
-	    <input type="button" value ="취소" onclick="location.href='/summat/sm/main.jsp'">
+	    <input type="button" value ="취소" onclick="location.href='/summat/main/main.jsp'">
 	</div>
 </form>
 </body>

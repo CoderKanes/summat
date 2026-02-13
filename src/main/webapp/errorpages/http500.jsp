@@ -38,7 +38,7 @@
 
 				<div class="error-actions">
 					<button onclick="location.reload()">새로고침</button>
-					<button class="primary" onclick="location.href='/summat/sm/main.jsp'">
+					<button class="primary" onclick="location.href='/summat/main/main.jsp'">
 						홈으로
 					</button>
 				</div>
