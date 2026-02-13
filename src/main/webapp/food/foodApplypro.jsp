@@ -60,13 +60,13 @@ function sendImage() {
     // 가게 저장
     
     StoreDTO storeDto = new StoreDTO();
-    storeDto.setStoreName(storeName);
+    //storeDto.setStoreName(storeName);
     storeDto.setPhone(phone);
     storeDto.setAddress(address);
 
     StoreDAO storeDao = new StoreDAO();
-    int storeId = storeDao.insertStore(storeDto);
-    System.out.println("storeId 결과값 = " + storeId);
+    //int storeId = storeDao.insertStore(storeDto);
+    //System.out.println("storeId 결과값 = " + storeId);
     
 %>
 

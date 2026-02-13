@@ -17,8 +17,7 @@ public class CommentDAO {
 			e.printStackTrace();
 		}
 	}
-
-	// 1️ 특정 게시글의 댓글 목록 조회
+	// 1️ 특정 게시글의 댓글 목록 조회★view 페이지
 	public List<CommentDTO> getCommentsByBoard_Num(int boardNum) {
 		List<CommentDTO> list = new ArrayList<>();
 		String sql = "SELECT id, board_num, writer, content, regdate FROM BOARD_COMMENT WHERE board_num=? ORDER BY id ASC";
@@ -44,8 +43,7 @@ public class CommentDAO {
 		}
 		return list;
 	}
-
-	// 댓글 등록 ( ID 는 외부에서 생성되어 전달됨)
+	// 댓글 등록 ( ID 는 외부에서 생성되어 전달됨) ◐comment_insert페이지
 	public void insertComment(CommentDTO comment) {
 	    String sql = "INSERT INTO BOARD_COMMENT(id, board_num, password, content, writer, regdate) " +
 	                 "VALUES(board_comment_seq.NEXTVAL, ?, ?, ?, ?, SYSDATE)";
@@ -60,7 +58,7 @@ public class CommentDAO {
 	        e.printStackTrace();
 	    }
 	}
-	// 3️  특정 게시글의 댓글 수 조회
+	// 3️  특정 게시글의 댓글 수 조회  ● list페이지
 	public int getCommentCountByBoardNum(int boardNum) {
 		int count = 0;
 		String sql = "SELECT COUNT(*) FROM BOARD_COMMENT WHERE board_num=?";
@@ -77,22 +75,7 @@ public class CommentDAO {
 		return count;    
 		
 	}
-	
-	public int get이글의댓글개수(int 글번호)
-	{
-		int count=0;
-		
-		try {
-			PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM BOARD_COMMENT WHERE board_num=?");
-			ps.executeQuery();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return count;
-	}
-
-	// DB Connection 종료
+	// DB Connection 종료  ● list페이지   ★view 페이지
 	public void close() {
 		try {
 			if (conn != null)
@@ -101,8 +84,7 @@ public class CommentDAO {
 			e.printStackTrace();
 		}
 	}
-
-    // 3. 댓글 삭제
+    // 3. 댓글 삭제 ▦comment_delete페이지
 	public boolean deleteComment(int id, String password) {
 
 	    String sql = "DELETE FROM board_comment WHERE id=? AND password=?";

@@ -23,11 +23,12 @@ public class StoreDAO {
 	
 		try {
 			conn = OracleConnection.getConnection();
-			String sql = "insert into store (Id, name, phone, address, status, created_at) values(store_seq.nextval, ?, ?, ?, 0, sysdate)";
+			String sql = "insert into store (Id, name, phone, address, geoCode, status, created_at) values(store_seq.nextval, ?, ?, ?,?, 0, sysdate)";
 			 pstmt = conn.prepareStatement(sql, new String[] { "ID" }); 
 			pstmt.setString(1, dto.getName());
 			pstmt.setString(2, dto.getPhone());
 			pstmt.setString(3, dto.getAddress());
+			pstmt.setString(4, dto.getGeoCode());
 
 			boolean insertresult = pstmt.executeUpdate() > 0;
 			
@@ -47,7 +48,7 @@ public class StoreDAO {
 		return resultStoreId;
 	}	
 	public StoreDTO GetStoreInfo(int id) {
-		StoreDTO result = null;
+		StoreDTO result = null;		
 		try {
 			conn = OracleConnection.getConnection();
 			String sql = "select * from store where id = ?";
@@ -55,8 +56,8 @@ public class StoreDAO {
 			pstmt.setInt(1, id);
 			rs = pstmt.executeQuery();
 			
-			if(rs.next()) {
-				result = new StoreDTO();				
+			if(rs.next()) {	
+				result = new StoreDTO();		
 				result.setId(rs.getInt("id"));
 				result.setName(rs.getString("name"));
 				result.setPhone(rs.getString("phone"));

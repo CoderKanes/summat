@@ -54,9 +54,13 @@ input[type=text] {
 	String menuDataParam = request.getParameter("menuData");
 	String nameParam = request.getParameter("name");
 	String addressParam = request.getParameter("address");
+	String subaddressParam = request.getParameter("sub_address");
+	String geoCodeParam = request.getParameter("geoCode");
 	String phoneNumParam = request.getParameter("phoneNum");	
 	if(nameParam==null){nameParam ="";}
 	if(addressParam==null){addressParam ="";}
+	if(subaddressParam==null){subaddressParam ="";}
+	if(geoCodeParam==null){geoCodeParam ="";}
 	if(phoneNumParam==null){phoneNumParam ="";}
 	
 	
@@ -127,6 +131,8 @@ function renderMenus() {
 function editMenus() {	
 	const name = document.getElementById('name').value;
 	const address = document.getElementById('address').value;
+	const sub_address = document.getElementById('sub_address').value;
+	const geoCode = document.getElementById('geoCode').value;
 	const phoneNum = document.getElementById('phoneNum').value;
 
 	const params = new URLSearchParams();
@@ -136,6 +142,12 @@ function editMenus() {
     }
     if (address) {
         params.append('address', address);
+    }
+    if (sub_address) {
+        params.append('sub_address', sub_address);
+    }
+    if (geoCode) {
+        params.append('geoCode', geoCode);
     }
     if (phoneNum) {
         params.append('phoneNum', phoneNum);
@@ -167,7 +179,12 @@ function editMenus() {
 	
 	    <div class="row">
 	        <label>가게주소</label>
-	        <input type="text" id="address" name="address" value="<%=addressParam%>" required>
+	        <jsp:include page="/util/addressInput.jsp">
+	        	<jsp:param name="address" value="<%=addressParam%>" />
+	        	<jsp:param name="sub_address" value="<%=subaddressParam%>" />
+	        	<jsp:param name="geoCode" value="<%=geoCodeParam%>" />
+	        	<jsp:param name="address_required" value="true" />
+	        </jsp:include>
 	    </div>
 	
 	    <div class="row">

@@ -132,6 +132,40 @@ public class MenuDAO {
 		
 		return result;	
 	}
+	public MenuDTO getFoodInfo(int menuid) {
+		MenuDTO result = null;
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "select * from menu where id=? ";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, menuid);
+			
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				result = new MenuDTO();				
+				
+				result.setId(rs.getInt("Id"));
+				result.setStoreId(rs.getInt("storeId"));
+				result.setGroupNum(rs.getInt("groupNum"));
+				result.setOrderIdx(rs.getInt("OrderIdx"));
+				result.setName(rs.getString("name"));
+				result.setMenu_desc(rs.getString("menu_desc"));
+				result.setPrice(rs.getInt("price"));
+				result.setImage(rs.getString("image"));
+				result.setCCategory_str(rs.getString("CCATEGORY_STR"));
+			    result.setFCategory_str(rs.getString("FCATEGORY_STR"));
+			    result.setFoodItem_str(rs.getString("FOODITEM_STR"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		
+		return result;	
+	}
 	
 	public List<MenuDTO> getMenus(int storeId) {
 		List<MenuDTO> result = new ArrayList<MenuDTO>();

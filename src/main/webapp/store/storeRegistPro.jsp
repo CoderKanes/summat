@@ -19,8 +19,16 @@
 	
 	//required params	
 	store_dto.setName(request.getParameter("name"));
-	store_dto.setPhone(request.getParameter("address"));
-	store_dto.setAddress(request.getParameter("phoneNum"));	
+	store_dto.setPhone(request.getParameter("phoneNum"));
+	
+	String addressParam = request.getParameter("address");
+	String subAddressParam = request.getParameter("sub_address");
+	if(addressParam!=null &&subAddressParam !=null)	{
+		store_dto.setAddress(addressParam +" "+ subAddressParam);	
+	}else{
+		store_dto.setAddress(addressParam );	
+	}
+	store_dto.setGeoCode(request.getParameter("geoCode"));	
 	
 	int resultStroeId = store_dao.InsertStore(store_dto);
 	if(resultStroeId != -1)	{
@@ -43,14 +51,6 @@
 			}			
 		}
 	}	
+	response.sendRedirect("storeRegistResult.jsp?resultStroeId="+resultStroeId);
 %>
 
-<h1>스토어 등록 진행 페이지</h1>
-<script>
-<%if(resultStroeId == -1){%>
-	alert("등록실패. 나중에 다시시도해 주세요.");
-<%}else{%>
-	alert("등록완료. 관리자 승인후 게재됩니다.");
-<%}%>
-location.href = '/summat/main/main.jsp';
-</script>

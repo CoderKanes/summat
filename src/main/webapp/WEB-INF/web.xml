@@ -13,15 +13,32 @@
   </welcome-file-list>
 
 
-  <!--
-  <error-page>
-	  <error-code>500</error-code>
-	  <location>/errorpages/http500.jsp</location>
-  </error-page> -->
-  <error-page>
-	  <error-code>404</error-code>
-	  <location>/errorpages/http404.jsp</location>
-  </error-page> 
-  
-  
+	<!-- 
+	<error-page> 
+		<error-code>500</error-code> 
+		<location>/errorpages/http500.jsp</location> 
+	</error-page> 
+	-->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/errorpages/http404.jsp</location>
+	</error-page>
+
+	<servlet>
+		<servlet-name>geocode</servlet-name>
+		<servlet-class>sm.util.GeocodeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>geocode</servlet-name>
+		<url-pattern>/api/geocode</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>reverse</servlet-name>
+		<servlet-class>sm.util.ReverseServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>reverse</servlet-name>
+		<url-pattern>/api/reverse</url-pattern>
+	</servlet-mapping>
 </web-app>

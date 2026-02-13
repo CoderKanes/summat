@@ -20,7 +20,7 @@ public class BoardDAO {
 	private ResultSet rs;
 
 	private static BoardDAO instance = new BoardDAO();
-
+							//  ● list페이지
 	public static BoardDAO getInstance() {
 
 		return instance;
@@ -37,7 +37,7 @@ public class BoardDAO {
 
 	}
 
-	// 1. 전체 게시글 목록 조회 (최신 글 순)
+	// 1. 전체 게시글 목록 조회 (최신 글 순)  일단 호출 하는 곳 없음 
 	public List<BoardDTO> getList() {
 
 		List<BoardDTO> list = new ArrayList<>();
@@ -64,7 +64,7 @@ public class BoardDAO {
 		return list;
 	}
 
-	// 2. 게시글 등록
+	// 2. 게시글 등록  ■writeProc페이지
 	public int insert(BoardDTO dto) {
 
 		int result = 0;
@@ -80,15 +80,12 @@ public class BoardDAO {
 			ps.setString(5, dto.getPassword());
 			result = ps.executeUpdate();
 
-		     // 👇 여기 추가
-	        System.out.println("password = " + dto.getPassword());
-			
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
 		return result;
 	}
-	// 3.게시글 번호로 게시글 조회
+	// 3.게시글 번호로 게시글 조회★ view 페이지 기능   ☆editForm페이지
 	public BoardDTO getBoardByNum(int num) {
 		BoardDTO result = new BoardDTO();
 
@@ -116,7 +113,7 @@ public class BoardDAO {
 		return result;
 	}
 
-	// 4.전체 게시글 목록 조회 (상세 정보 포함)
+	// 4.전체 게시글 목록 조회 (상세 정보 포함)  ● list페이지
 	public List<BoardDTO> getAllBoards(int start , int end) {
 		
 		List<BoardDTO> list = new ArrayList<>();
@@ -157,7 +154,7 @@ public class BoardDAO {
 		return list;
 	}
 
-	// 5.댓글 조회
+	// 5.댓글 조회 test  view 부분에서 호출 중  그외 호출 하는 곳 없음 
 	public List<CommentDTO> getCommentsByBoardNum(int boardNum) {
 
 		List<CommentDTO> list = new ArrayList<>();
@@ -185,53 +182,8 @@ public class BoardDAO {
 
 		return list;
 	}
-
-	// 6.댓글 작성
-	public void insertComment(CommentDTO comment) {
-		String sql = "INSERT INTO comment_table "
-		           + "(id, board_num, writer, content, regdate) "
-		           + "VALUES (comment_seq.NEXTVAL, ?, ?, ?, SYSDATE)";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, comment.getId());
-			ps.setInt(2, comment.getBoard_Num());
-			ps.setString(3, comment.getWriter());
-			ps.setString(4, comment.getContent());
-			ps.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	// 6 -1 댓글 삭제 기능 
-	public boolean deleteComment(int id, String password) {
-		
-		 String sql = "DELETE FROM board WHERE id=? AND password=?";
-		 
-	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-	    	ps.setInt(1, id);
-	    	ps.setString(2, password);
-	    	
-	        int result = ps.executeUpdate();
-	        return result > 0;
-	        
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	        
-	        return false;
-	    }
-	}
 	
-	// 7.조횟수 증가
-	public void increaseHit(int num) {
-		String sql = "UPDATE board SET hit = hit + 1 WHERE num = ?";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, num);
-			ps.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	// 8.게시판 댓글 삭제
+	// 6.게시판 댓글 삭제 〓delete페이지
 	public void deleteBoardAndComments(int num) {
 		try {
 			// 댓글 먼저 삭제
@@ -251,19 +203,8 @@ public class BoardDAO {
 			e.printStackTrace();
 		}
 	}
-
-	// 9. 게시글 삭제
-	public void deleteBoard(int num) {
-		String sql = "DELETE FROM board WHERE num = ?";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setInt(1, num);
-			ps.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	// 10. 게시판 검색
+	
+	// 7. 게시판 검색  ● list페이지
 	public List<BoardDTO> searchBoards(String keyword) {
 		List<BoardDTO> list = new ArrayList<>();
 		String sql = "SELECT num, title, content, writer, regDate, hit FROM board "
@@ -299,139 +240,12 @@ public class BoardDAO {
 
 		return list;
 	}
-	// 11.DB 연결 객체(Connection)를 생성하여 반환하는 메서드
+	// 8.DB 연결 객체(Connection)를 생성하여 반환하는 메서드
 	private Connection getConnection() throws Exception {
 		return OracleConnection.getConnection(); // DBConnection 클래스가 있어야 합니다.
 	}
 
-	// 1️2 게시글 목록 가져오기
-	public List<BoardDTO> getAllPosts() {
-		List<BoardDTO> list = new ArrayList<>();
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			conn = getConnection();
-			String sql = "SELECT * FROM board ORDER BY id DESC";
-			ps = conn.prepareStatement(sql);
-			rs = ps.executeQuery();
-
-			while (rs.next()) {
-				BoardDTO post = new BoardDTO();
-				post.setId(rs.getInt("id"));
-				post.setTitle(rs.getString("title"));
-				post.setContent(rs.getString("content"));
-				post.setWriter(rs.getString("writer"));
-				post.setRegDate(rs.getString("regDate"));
-				list.add(post);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return list;
-	}
-
-	// 13 글 하나 가져오기
-	public BoardDTO getPost(int id) {
-		BoardDTO post = null;
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			conn = getConnection();
-			String sql = "SELECT * FROM board WHERE id=?";
-			ps = conn.prepareStatement(sql);
-			ps.setInt(1, id);
-			rs = ps.executeQuery();
-
-			if (rs.next()) {
-				post = new BoardDTO();
-				post.setId(rs.getInt("id"));
-				post.setTitle(rs.getString("title"));
-				post.setContent(rs.getString("content"));
-				post.setWriter(rs.getString("writer"));
-				post.setRegDate(rs.getString("regDate"));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return post;
-	}
-
-	// 14 글 수정
-	public int updatePost(int id, String title, String content) {
-		int result = 0;
-		Connection conn = null;
-		PreparedStatement ps = null;
-
-		try {
-			conn = getConnection();
-			String sql = "UPDATE board SET title=?, content=? WHERE id=?";
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, title);
-			ps.setString(2, content);
-			ps.setInt(3, id);
-			result = ps.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return result;
-	}
-
-	// 15 글 삭제
+	// 9 글 삭제   ??? 잘 모르겠음 보류 
 	public int DeletePost(int num) {
 		int result = 0;
 		Connection conn = null;
@@ -463,7 +277,7 @@ public class BoardDAO {
 		return result;
 	}
 
-	// 16 조회수 증가 (한 IP당 1회)
+	// 10 조회수 증가 (한 IP당 1회) ★view 페이지
 	public boolean increaseHitByIP(int num, String ip) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -517,7 +331,7 @@ public class BoardDAO {
 
 		return success;
 	}
-	// 17. 게시판 전체 게시글 수를 조회하여 반환하는 메서드
+	// 11 게시판 전체 게시글 수를 조회하여 반환하는 메서드  ● list페이지 
 	public int getBoardCount() {
 		int count = 0;
 		String sql = "SELECT COUNT(*) FROM board";
@@ -537,138 +351,85 @@ public class BoardDAO {
 		return count;
 	}
 	
-	// 18. 검색 결과 페이징 처리를 위해 조건에 맞는 게시글 수를 조회
-	public int getArticleCount(String sqry) throws Exception {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		int x = 0;
-
-		try {
-			conn = getConnection();
-			pstmt = conn.prepareStatement("select count(*) from board " + sqry);
-			rs = pstmt.executeQuery();
-			if (rs.next()) {
-				x = rs.getInt(1);
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-			if (rs != null)
-				try {
-					rs.close();
-				} catch (SQLException ex) {
-				}
-			if (pstmt != null)
-				try {
-					pstmt.close();
-				} catch (SQLException ex) {
-				}
-			if (conn != null)
-				try {
-					conn.close();
-				} catch (SQLException ex) {
-				}
-		}
-		return x;
-	}
-
-	// 19. 검색 조건과 페이징 범위(start~end)에 따라 게시글 목록을 조회하는 메서드
-	public List<BoardDTO> getArticles(int start, int end, String sqry) throws Exception {
-
-	    Connection conn = null;
-	    PreparedStatement pstmt = null;
-	    ResultSet rs = null;
-	    List<BoardDTO> articleList = null;
-
-	    String sql =
-	        "SELECT num, writer, regDate, content " +
-	        "FROM ( " +
-	        "  SELECT num, writer, regDate, content, rownum r " +
-	        "  FROM ( " +
-	        "    SELECT num, writer, regDate, content " +
-	        "    FROM board " + sqry +
-	        "    ORDER BY ref DESC, re_step ASC " +
-	        "  ) " +
-	        ") " +
-	        "WHERE r BETWEEN ? AND ?";
+	// 12 게시글 수정 ▲editPro페이지
+	public int update(BoardDTO dto) {
+	    int result = 0; // 수정 성공 여부 저장 (0: 실패, 1: 성공)
+	    Connection conn = null; // DB 연결 객체
+	    PreparedStatement ps = null; // SQL 실행 객체
 
 	    try {
 	        conn = getConnection();
-	        pstmt = conn.prepareStatement(sql);
-	        pstmt.setInt(1, start);
-	        pstmt.setInt(2, end);
+	        String sql = "UPDATE board SET title = ?, writer = ?, content = ? WHERE num = ? AND password = ?";
+	        ps = conn.prepareStatement(sql);
+	        ps.setString(1, dto.getTitle());    // 제목
+	        ps.setString(2, dto.getWriter());   // 작성자
+	        ps.setString(3, dto.getContent());  // 내용
+	        ps.setInt(4, dto.getNum());         // 글 번호
+	        ps.setString(5, dto.getPassword()); // 비밀번호
+	        result = ps.executeUpdate();
 
-	        rs = pstmt.executeQuery();
-
-	        articleList = new ArrayList<>();
-
-	        while (rs.next()) {
-	            BoardDTO article = new BoardDTO();
-	            article.setNum(rs.getInt("num"));
-	            article.setWriter(rs.getString("writer"));
-	            article.setContent(rs.getString("content"));
-	            article.setRegDate(rs.getString("regDate"));
-	            articleList.add(article);
-	        }
-
-	    } finally {
-	        if (rs != null) rs.close();
-	        if (pstmt != null) pstmt.close();
-	        if (conn != null) conn.close();
-	    }
-
-	    return articleList;
-	}
-
-	// 20. 시퀀스를 사용해 게시글 번호를 자동 증가시키며 더미 게시글을 등록
-	public void insertDummyArticles(int count) {
-
-		String sql = "INSERT INTO board (num, title, content, writer, regdate, hit) "
-				+ "VALUES (board_seq.NEXTVAL, ?, ?, ?, SYSDATE, 0)";
-
-		try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-			for (int i = 1; i <= count; i++) {
-				pstmt.setString(1, "자동 생성 게시글 제목 " + i);
-				pstmt.setString(2, "이것은 자동으로 생성된 게시글 내용입니다. 번호: " + i);
-				pstmt.setString(3, "관리자");
-
-				pstmt.executeUpdate();
-
-			}
-			System.out.println(count + "개의 더미 게시글 생성 완료");
-			pstmt.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	// 21. 게시글 번호(num)에 해당하는 게시글 정보를 조회하여 반환하는 메서드
-	public BoardDTO getArticleByNum(int num) {
-	    BoardDTO dto = null;
-
-	    try {
-	        conn = getConnection();
-
-	        String sql = "SELECT * FROM board WHERE num = ?";
-	        pstmt = conn.prepareStatement(sql);
-	        pstmt.setInt(1, num);
-	        rs = pstmt.executeQuery();
-
-	        if (rs.next()) {
-	            dto = new BoardDTO();
-	            dto.setNum(rs.getInt("num"));
-	            // 필요한 컬럼 추가 설정 가능 
-	        }
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        e.printStackTrace(); // 오류 발생 시 콘솔에 출력
 	    } finally {
-	        OracleConnection.closeAll(conn, pstmt, rs);
+	        // 5️⃣ 자원 해제: PreparedStatement
+	        try {
+	            if(ps != null) ps.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+
+	        // 6️⃣ 자원 해제: Connection
+	        try {
+	            if(conn != null) conn.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
 	    }
-	    
-	    return dto;
-	    
+
+	    // 7️⃣ 수정 결과 반환 (1: 성공, 0: 실패)
+	    return result;
 	}
-	
+	  //13 게시글 리스트에서 삭제 
+    public boolean deleteComment(int num, String password) {
+
+        try {
+
+            // 1️⃣ 글 번호로 해당 댓글 비밀번호 조회
+            String sqlCheck = "SELECT password FROM board WHERE num = ?";
+            pstmt = conn.prepareStatement(sqlCheck);
+            pstmt.setInt(1, num);
+            rs = pstmt.executeQuery();
+
+            if(rs.next()) {
+                String dbPassword = rs.getString("password");
+
+                if(dbPassword.equals(password)) {
+                    // 2️⃣ 비밀번호 일치 → 삭제
+                    String sqlDelete = "DELETE FROM board WHERE num = ?";
+                    pstmt.close(); // 기존 pstmt 닫기
+                    pstmt = conn.prepareStatement(sqlDelete);
+                    pstmt.setInt(1, num);
+                    int result = pstmt.executeUpdate();
+
+                    return result > 0; // 삭제 성공 → true
+                } else {
+                    // ❌ 비밀번호 불일치
+                    return false;
+                }
+            } else {
+                // ❌ 글 번호 없음
+                return false;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            // 자원 반환
+            try { if(rs != null) rs.close(); } catch(SQLException e) { e.printStackTrace(); }
+            try { if(pstmt != null) pstmt.close(); } catch(SQLException e) { e.printStackTrace(); }
+            try { if(conn != null) conn.close(); } catch(SQLException e) { e.printStackTrace(); }
+        }
+    }
 }
+
