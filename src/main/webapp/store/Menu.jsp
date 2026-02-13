@@ -218,9 +218,7 @@ body {
 		<div class="group" data-group-id="<%=vdata.group.getNum()%>">
 			<% if(bEditMode){%>
 			<div class="group-header-edit" ondblclick="editGroupName(this)"				
-				oncontextmenu="groupAction(event,this)"
-				ontouchstart="groupTouchStart(event,this)"
-				ontouchend="groupTouchEnd()">
+				oncontextmenu="groupAction(event,this)">
 			<% }else{%>
 			<div class="group-header">
 			<% } %>
@@ -299,37 +297,37 @@ function initGroupSortable(){
   });
 }
 
-/* ===== 그룹 롱터치 ===== */
-function groupTouchStart(e,h){
-  groupTimer=setTimeout(()=>{
-    document.querySelectorAll('.group').forEach(g=>{
-      if(!g.contains(h)) g.classList.add('collapsed');
-    });
-  },400);
-}
-function groupTouchEnd(){
-  clearTimeout(groupTimer);
-  document.querySelectorAll('.group')
-    .forEach(g=>g.classList.remove('collapsed'));
-}
-
 /* ===== 그룹명 수정 ===== */
-function editGroupName(el){
-  if(el.classList.contains('editing'))return;
-  const old=el.innerText;
-  el.classList.add('editing');
-  el.innerHTML=`<input value=`+old+`>`;
-  const i=el.querySelector('input');
-  i.focus();
-  i.onblur=()=>finish();
-  i.onkeydown=e=>{
-    if(e.key==='Enter')finish();
-    if(e.key==='Escape'){el.innerText=old;el.classList.remove('editing');}
+function editGroupName(headerEl) {
+  // 1. 헤더 내부에서 제목이 들어있는 span만 찾습니다.
+  const titleSpan = headerEl.querySelector('.group-title');
+  if (!titleSpan || headerEl.classList.contains('editing')) return;
+
+  const oldName = titleSpan.innerText;
+  headerEl.classList.add('editing');
+
+  // 2. span 내부를 input으로 교체 (버튼은 건드리지 않음)
+  titleSpan.innerHTML = `<input type="text" value="${oldName}" style="width:70%;">`;
+  
+  const input = titleSpan.querySelector('input');
+  input.focus();
+  input.select(); // 텍스트 전체 선택 (사용자 편의성)
+
+  // 3. 완료 처리 함수
+  const finish = () => {
+    const newName = input.value.trim() || oldName;
+    headerEl.classList.remove('editing');
+    titleSpan.innerText = newName; // input을 제거하고 텍스트만 남김
   };
-  function finish(){
-    el.classList.remove('editing');
-    el.innerText=i.value.trim()||'그룹명';
-  }
+
+  input.onblur = finish;
+  input.onkeydown = e => {
+    if (e.key === 'Enter') finish();
+    if (e.key === 'Escape') {
+      headerEl.classList.remove('editing');
+      titleSpan.innerText = oldName; // 원래대로 복구
+    }
+  };
 }
 
 /* ===== 그룹 삭제 ===== */
@@ -457,7 +455,7 @@ function saveEdit() {
 	      const img = menuEl.querySelector('.menu-img')?.getAttribute('src') || '';
 	      const desc = menuEl.querySelector('.menu-desc')?.innerText.trim() || '';
 	      const culture = menuEl.dataset.culture || '';
-	      const foodTypes = menuEl.dataset.foodTypes || '[]';
+	      const foodTypes = menuEl.dataset.foodTypes || '';
 	      const foodItem = menuEl.dataset.foodItem || '';
 	      records.push(['M', groupId, mOrder, menuId, name, price, img, desc, culture, foodTypes, foodItem].join(FS));
 	    });

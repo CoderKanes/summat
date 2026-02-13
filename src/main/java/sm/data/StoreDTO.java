@@ -7,7 +7,9 @@ public class StoreDTO {
     private String name;
     private String phone;
     private String address;
-    private int status;
+    private String geoCode;
+
+	private int status;
 	private Timestamp created_at;
 
    
@@ -23,7 +25,10 @@ public class StoreDTO {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
     
-    public int getStatus() { return status; }
+    public String getGeoCode() {return geoCode;	}
+	public void setGeoCode(String geoCode) {this.geoCode = geoCode;	}
+	
+    public int getStatus() { return status; }    
 	public void setStatus(int status) {	this.status = status; }
 	
 	public Timestamp getCreated_at() {	return created_at;	}

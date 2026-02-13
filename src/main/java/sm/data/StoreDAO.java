@@ -23,11 +23,12 @@ public class StoreDAO {
 	
 		try {
 			conn = OracleConnection.getConnection();
-			String sql = "insert into store (Id, name, phone, address, status, created_at) values(store_seq.nextval, ?, ?, ?, 0, sysdate)";
+			String sql = "insert into store (Id, name, phone, address, geoCode, status, created_at) values(store_seq.nextval, ?, ?, ?,?, 0, sysdate)";
 			 pstmt = conn.prepareStatement(sql, new String[] { "ID" }); 
 			pstmt.setString(1, dto.getName());
 			pstmt.setString(2, dto.getPhone());
 			pstmt.setString(3, dto.getAddress());
+			pstmt.setString(4, dto.getGeoCode());
 
 			boolean insertresult = pstmt.executeUpdate() > 0;
 			
