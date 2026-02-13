@@ -71,13 +71,14 @@ body {
 	Map< String, Integer> foodItemMap = MenuCategoryDAO.getInstance().getFoodItemReverseMap();
 
 	class FoodVeiwData{
-		String name;
-		String Image;
+		private int id;
+		private String name;
+		private String Image;
 		
-		FoodVeiwData(String n, String i){
-	name = n; Image = i;
+		FoodVeiwData(int id, String n, String i){
+	this.id = id; name = n; Image = i;
 		};
-		
+		int getId(){return id;}
 		String getImage(){return Image;}
 		String getName(){return name;}
 	}
@@ -102,7 +103,7 @@ body {
 		// if(sdto.getStatus() == 0) continue;
 	
 		String foodName = sdto==null? dto.getName() : dto.getName() +" ("+ sdto.getName()+")";
-		FoodVeiwData f = new FoodVeiwData(foodName, dto.getImage());	
+		FoodVeiwData f = new FoodVeiwData(dto.getId(), foodName, dto.getImage());	
 		System.out.println(foodName + dto.getCCategory_str()  + dto.getFCategory_str() + dto.getFoodItem_str());
 		if(dto.getCCategory_str() != null && cultureMap.get(dto.getCCategory_str()) != null)
 		{		
@@ -176,9 +177,9 @@ body {
 				<div class="card-container">		
 					<% for (FoodVeiwData food : entry.getValue()) { %>
 					<div class="food-card">
-						<img src="<%= food.getImage() %>">
+						<a href="foodView.jsp?menuId=<%=food.getId()%>"><img src="<%= food.getImage() %>"></a>
 						<div class="food-info">
-							<div class="food-name"><%= food.getName() %></div>
+							<div class="food-name"><a href="foodView.jsp?menuId=<%=food.getId()%>"><%= food.getName() %></a></div>
 						</div>
 					</div>
 					<% } %>		
