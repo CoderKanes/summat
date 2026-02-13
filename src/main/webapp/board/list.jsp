@@ -77,7 +77,9 @@ function boarddelete(Num) {
 
 <!-- 5️ 교실 이동 (HTML 시작)  -->
 <h2>
+	<a href="main/main.jsp">●홈●</a>
 	<a href="list.jsp?">게시글 목록</a>
+	
 </h2>
 
 <head>

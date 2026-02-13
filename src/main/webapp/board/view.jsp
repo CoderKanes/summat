@@ -43,6 +43,7 @@
 <link href="/summat/resources/css/style.css" rel="stylesheet" />
 <%-- 스타일시트 연결 --%>
 <html>
+
 <head>
 <meta charset="UTF-8">
 <title>게시글 보기</title>
@@ -127,7 +128,8 @@ function deletePost(num) {
 %>
     <%-- 12️ 게시글 관련 버튼 --%>
 <p>
-    <a href="list.jsp">목록으로 돌아가기</a>
+    <%-- <a href="list.jsp">목록으로 돌아가기</a>--%>
+	<button type="button" onclick="location.href='list.jsp'">목록으로 돌아가기</button>
    
     <input type="button" value="글 삭제" onclick="deletePost(<%= board.getNum() %>)">
     <button onclick="location.href='editForm.jsp?id=<%= board.getNum() %>'">글 수정</button>
