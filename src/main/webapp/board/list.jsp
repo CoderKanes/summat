@@ -76,11 +76,6 @@ function boarddelete(Num) {
 
 
 <!-- 5️ 교실 이동 (HTML 시작)  -->
-<h2>
-	<a href="main/main.jsp">●홈●</a>
-	<a href="list.jsp?">게시글 목록</a>
-	
-</h2>
 
 <head>
 <meta charset="UTF-8">
@@ -88,7 +83,10 @@ function boarddelete(Num) {
 </head>
 <body>
 
-
+	<jsp:include page="/main/topBar.jsp"></jsp:include>
+	<a href="main/main.jsp">●홈●</a>
+	<a href="list.jsp?">게시글 목록</a>
+	
 
 	<!-- 2️ 검색 폼 영역 -->
 	<form method="get" action="list.jsp">

@@ -88,6 +88,9 @@ public class FoodCategoryUtil {
 	}
 	public static String generateMenuDataString(List<MenuGroupDTO> groups , List<MenuDTO> menus )
 	{
+		if(groups == null) return "";
+		if(menus == null) menus = new ArrayList<MenuDTO>();
+		
 		String menuData = "";
 		
 		//generate menuData format; 

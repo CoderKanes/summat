@@ -48,7 +48,7 @@ public class StoreDAO {
 		return resultStoreId;
 	}	
 	public StoreDTO GetStoreInfo(int id) {
-		StoreDTO result = null;
+		StoreDTO result = null;		
 		try {
 			conn = OracleConnection.getConnection();
 			String sql = "select * from store where id = ?";
@@ -56,8 +56,8 @@ public class StoreDAO {
 			pstmt.setInt(1, id);
 			rs = pstmt.executeQuery();
 			
-			if(rs.next()) {
-				result = new StoreDTO();				
+			if(rs.next()) {	
+				result = new StoreDTO();		
 				result.setId(rs.getInt("id"));
 				result.setName(rs.getString("name"));
 				result.setPhone(rs.getString("phone"));
