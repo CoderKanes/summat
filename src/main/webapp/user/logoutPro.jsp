@@ -34,7 +34,7 @@
 	
 	response.addCookie(ug);
 	
-	response.sendRedirect("/summat/sm/main.jsp");
+	response.sendRedirect("/summat/main/main.jsp");
 %>
 </body>
 </html>

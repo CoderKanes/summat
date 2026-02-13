@@ -108,7 +108,7 @@
       if (link) {
         const href = link.getAttribute('href');
         // 현재 경로가 href로 시작하거나 포함되면 active 추가
-        if (currentPath === href || (href !== '/summat/sm/main.jsp' && currentPath.includes(href))) {
+        if (currentPath === href || (href !== '/summat/main/main.jsp' && currentPath.includes(href))) {
           li.classList.add('active');
         } else {
           li.classList.remove('active');

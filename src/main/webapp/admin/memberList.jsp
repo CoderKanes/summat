@@ -91,7 +91,7 @@
 	}
 	
 	if(!isAdmin){
-		response.sendRedirect("/summat/sm/main.jsp");
+		response.sendRedirect("/summat/main/main.jsp");
 	}
 	
 	
@@ -271,7 +271,7 @@
    }
    		if (currentPage > 1) {
 %>
-   			<a href="postList.jsp?pageNum=<%=currentPage-1%>">[<] </a>
+   			<a href="memberList.jsp?pageNum=<%=currentPage-1%>">[<] </a>
 <%
    		}
    		for (int i = startPage ; i <= endPage ; i++) {

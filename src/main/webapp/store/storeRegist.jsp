@@ -156,7 +156,7 @@ function editMenus() {
 </head>
 
 <body>
-<form action="storeRegistPro.jsp" method="get">
+<form action="/summat/admin/dashboard.jsp" method="get">
 	<div class="container">
 	    <h2>가게 정보 등록</h2>
 	

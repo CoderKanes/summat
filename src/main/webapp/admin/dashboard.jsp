@@ -59,13 +59,20 @@
     int activeMembers = dao.getCountByStatus("ACTIVE", searchQuery);
     int deactiveMembers = dao.getCountByStatus("DEACTIVE", searchQuery);
     int emailVerified = dao.getEmailVerifiedCount(searchQuery);
+
+    //상점 신청 파람 받기 후속 작업 필요시 작업
+    String name = request.getParameter("name");
+    String address = request.getParameter("address");
+    String phone = request.getParameter("phoneNum");
+    String menuData = request.getParameter("menuData");
+    
 %>
 
 <div class="header-row">
   <div class="page-title">
   	관리자 대시보드
   	<button type="button" onclick="document.location.href='/summat/admin/memberList.jsp'">리스트로</button>
-  	<button type="button" onclick="document.location.href='/summat/sm/main.jsp'">메인으로</button>
+  	<button type="button" onclick="document.location.href='/summat/main/main.jsp'">메인으로</button>
   	<button type="button" onclick="document.location.href='/summat/store/storeAdmin.jsp'">상점신청승인페이지</button>
   </div>
   <!-- 검색 폼 -->

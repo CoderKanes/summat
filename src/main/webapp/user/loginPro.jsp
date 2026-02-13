@@ -95,7 +95,7 @@
 
         // 리다이렉트 (컨텍스트 패스 사용 권장)
         String ctx = request.getContextPath();
-        response.sendRedirect(ctx + "/sm/main.jsp");
+        response.sendRedirect(ctx + "/main/main.jsp");
     } else {
 %>
     <script type="text/javascript">
