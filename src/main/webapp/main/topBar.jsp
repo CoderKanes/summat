@@ -91,7 +91,7 @@
 </header>
 <nav class="top-nav">
     <ul>
-        <li class="nav-item"><a href="/summat/sm/main.jsp">홈</a></li>
+        <li class="nav-item"><a href="/summat/main/main.jsp">홈</a></li>
         <li class="nav-item"><a href="/summat/food/foodMain.jsp">음식정보</a></li>
         <li class="nav-item"><a href="/summat/post/postMain.jsp">포스트</a></li>
         <li class="nav-item"><a href="/summat/board/list.jsp">커뮤니티</a></li>
