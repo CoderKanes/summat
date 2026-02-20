@@ -1,6 +1,6 @@
 package sm.data;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class InfluencerRequestDTO {
 	

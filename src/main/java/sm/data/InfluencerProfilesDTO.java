@@ -2,7 +2,7 @@ package sm.data;
 
 import java.security.Timestamp;
 
-public class InfluencerProfiles {
+public class InfluencerProfilesDTO {
 	
 	private int id;
 	private String user_id;

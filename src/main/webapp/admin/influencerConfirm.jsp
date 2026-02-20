@@ -1,117 +1,274 @@
-<%@ page import="java.sql.*" %>
-<%@ page import="sm.data.OracleConnection" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.List,java.util.ArrayList,java.util.Collections,java.util.Comparator" %>
+<%@ page import="sm.data.InfluencerRequestDTO,sm.data.InfluencerRequestDAO" %>
+
 <%
 request.setCharacterEncoding("UTF-8");
 
-// 로그인 확인: 세션에서 user_id와 grade를 읽음
+// 로그인/권한 체크 (관리자 페이지라면 필요 시 grade 체크 추가)
 String userId = (String) session.getAttribute("sid");
-Integer gradeObj = (Integer) session.getAttribute("grade"); // 세션에 grade가 int로 저장되어 있다고 가정
-
-// 비로그인 처리
 if (userId == null || userId.trim().isEmpty()) {
-    response.sendRedirect("/summat/user/login.jsp");
+    response.sendRedirect(request.getContextPath() + "/user/loginForm.jsp");
     return;
 }
 
-// 세션에 grade가 없으면 안전하게 멤버 조회 없이 접근 차단(또는 필요하면 DB에서 한번만 조회하도록 변경)
-if (gradeObj == null) {
-    // 세션에 grade 정보가 없으면 마이페이지로 리다이렉트하거나 오류 페이지
-    response.sendRedirect("/summat/user/myPage.jsp");
-    return;
+// 파라미터 수집
+String q_user_id = request.getParameter("q_user_id");
+String q_status = request.getParameter("q_status");
+if (q_status == null || q_status.trim().isEmpty()) {
+    q_status = "pending"; // 👈 기본값을 "대기 중"으로!
+}
+String sortDirParam = request.getParameter("sortDir"); // "asc" or "desc"
+final String sortDir =
+("asc".equalsIgnoreCase(sortDirParam) || "desc".equalsIgnoreCase(sortDirParam))
+    ? sortDirParam.toLowerCase()
+    : "desc";
+
+
+String pageNum = request.getParameter("pageNum");
+if (pageNum == null || pageNum.trim().isEmpty()) pageNum = "1";
+int curPage = 1;
+try { curPage = Math.max(1, Integer.parseInt(pageNum)); } catch (Exception e) { curPage = 1; }
+
+// 페이징 설정
+int pageSize = 20;
+int pageGroupSize = 7;
+
+// DAO 호출: 전체(혹은 큰 범위) 가져와서 JSP에서 정렬+페이징
+int fetchStart = 1;
+int fetchEnd = Integer.MAX_VALUE; // 주의: 대량 데이터시 성능 이슈
+
+InfluencerRequestDAO dao = InfluencerRequestDAO.getInstance();
+List<InfluencerRequestDTO> allList = new ArrayList<InfluencerRequestDTO>();
+int totalCount = 0;
+try {
+    allList = dao.getRequeList(q_user_id, q_status, fetchStart, fetchEnd);
+    totalCount = dao.getRequestCount(q_user_id, q_status);
+} catch (Exception e) {
+    e.printStackTrace();
+    allList = new ArrayList<InfluencerRequestDTO>();
+    totalCount = 0;
 }
 
-int grade = gradeObj.intValue();
+// requested_at 기준으로 서버측 정렬
+Collections.sort(allList, new Comparator<InfluencerRequestDTO>() {
+    public int compare(InfluencerRequestDTO a, InfluencerRequestDTO b) {
+        if (a.getRequested_at() == null && b.getRequested_at() == null) return 0;
+        if (a.getRequested_at() == null) return ("asc".equalsIgnoreCase(sortDir)) ? -1 : 1;
+        if (b.getRequested_at() == null) return ("asc".equalsIgnoreCase(sortDir)) ? 1 : -1;
+        int cmp = a.getRequested_at().compareTo(b.getRequested_at());
+        return "asc".equalsIgnoreCase(sortDir) ? cmp : -cmp;
+    }
+});
 
-// 이제 grade 값에 따라 JSP 본문에서 분기 처리합니다.
-// grade == 0 : 신청 가능
-// grade == 1 : 승인 대기중
+// JSP 쪽 페이징 (sublist)
+int totalPage = (int) Math.ceil((double) totalCount / pageSize);
+if (totalPage < 1) totalPage = 1;
+int startIndex = (curPage - 1) * pageSize; // 0-based
+int endIndex = Math.min(startIndex + pageSize, allList.size());
+List<InfluencerRequestDTO> pageList = new ArrayList<InfluencerRequestDTO>();
+if (startIndex < allList.size()) {
+    pageList = allList.subList(startIndex, endIndex);
+}
+
+// 페이징 UI 범위 계산
+int startPage = Math.max(1, curPage - (pageGroupSize/2));
+int endPage = Math.min(totalPage, startPage + pageGroupSize - 1);
+if (endPage - startPage + 1 < pageGroupSize) {
+    startPage = Math.max(1, endPage - pageGroupSize + 1);
+}
+
+// baseUrl (필터/정렬 유지)
+String baseUrl = request.getRequestURI() + "?";
+if (q_user_id != null && !q_user_id.isEmpty()) baseUrl += "q_user_id=" + java.net.URLEncoder.encode(q_user_id, "UTF-8") + "&";
+if (q_status != null && !q_status.isEmpty()) baseUrl += "q_status=" + java.net.URLEncoder.encode(q_status, "UTF-8") + "&";
+baseUrl += "sortDir=" + java.net.URLEncoder.encode(sortDir, "UTF-8") + "&";
 %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>인플루언서 등업 신청 확인</title>
+<title>인플루언서 등업 신청 목록 (관리자)</title>
 <style>
-/* 간단한 스타일 */
-.container { max-width:700px; margin:30px auto; padding:18px; background:#fff; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06); font-family:Arial, sans-serif;}
-.h1 { font-size:20px; margin-bottom:12px; color:#1f3b8a; }
-.notice { padding:12px; border-radius:6px; background:#f5f7ff; border:1px solid #e1e8ff; color:#243b6b; }
-.btn { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-weight:700; }
-.btn.primary { background:#2e7d32; color:#fff; }
-.btn.ghost { background:#fff; border:1px solid #ccc; }
+.container { max-width:1100px; margin:24px auto; padding:18px; font-family:Arial, sans-serif; }
+.toolbar { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+.table { width:100%; border-collapse:collapse; }
+.table th, .table td { border:1px solid #ddd; padding:8px; text-align:left; vertical-align:top; }
+.table thead { background:#f3f6ff; }
+.pager { margin-top:12px; }
+.pager a { margin:0 4px; text-decoration:none; color:#0366d6; }
+.small { font-size:0.9rem; color:#666; }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="h1">인플루언서 등업 신청</div>
 
 <%
-if (grade == 0) {
+// 처리 결과 메시지 표시
+String rawMsg = request.getParameter("msg");
+String msg = "";
+if (rawMsg != null) {
+    try {
+        msg = java.net.URLDecoder.decode(rawMsg, "UTF-8");
+    } catch (Exception e) {
+        msg = rawMsg;
+    }
+}
+if (!msg.isEmpty()) {
 %>
-  <!-- grade 0: 신청 가능 (원본 폼에서 전달된 값으로 여기서 DB insert 처리하거나 confirm 페이지로 연결) -->
-  <div class="notice">현재 등업 등급: <strong>0</strong>. 인플루언서 등업을 신청하실 수 있습니다.</div>
-
-  <!-- 간단한 확인/요약 보여주고 서버의 실제 insert 처리 페이지로 POST -->
-  <form method="post" action="/summat/user/influencerConfirmProcess.jsp">
-    <input type="hidden" name="user_id" value="<%= userId %>">
-    <div style="margin-top:12px;">
-      <label>신청 등급: </label>
-      <select name="requested_grade">
-        <option value="1">1</option>
-        <option value="2">2</option>
-      </select>
-    </div>
-    <div style="margin-top:12px;">
-      <label>신청 사유</label><br>
-      <textarea name="reason" rows="6" style="width:100%" required></textarea>
-    </div>
-    <div style="margin-top:8px;">
-      <label>SNS URL</label><br>
-      <input type="text" name="sns_urls" style="width:100%" placeholder="https://instagram.com/..., 쉼표(,)로 구분">
-    </div>
-
-    <div style="margin-top:14px; display:flex; gap:8px; justify-content:flex-end;">
-      <button type="button" class="btn ghost" onclick="history.back();">취소</button>
-      <button type="submit" class="btn primary">신청하기</button>
-    </div>
-  </form>
-
-<%
-} else if (grade == 1) {
-%>
-  <!-- grade 1: 이미 신청 상태(대기 중) -->
-  <div class="notice">
-    현재 등업 등급: <strong>1</strong> (승인 대기중입니다).<br>
-    관리자의 승인 후 등급이 반영됩니다. 문의가 필요하면 고객센터로 연락해주세요.
-  </div>
-  <div style="margin-top:16px;">
-    <a href="/summat/main/main.jsp"><button class="btn ghost">메인으로</button></a>
-    <a href="/summat/user/myPage.jsp"><button class="btn primary">내 계정 보기</button></a>
-  </div>
-
-<%
-} else if (grade == -1) {
-%>
-  <!-- members에 레코드 없음 -->
-  <div class="notice" style="background:#fff0f0;border-color:#ffd6d6;color:#8b1f1f;">
-    사용자 정보를 찾을 수 없습니다. 로그아웃 후 다시 로그인하거나 관리자에게 문의하세요.
-  </div>
-  <div style="margin-top:12px;">
-    <a href="/summat/user/login.jsp"><button class="btn primary">로그인</button></a>
-  </div>
-
-<%
-} else {
-%>
-  <!-- 기타 상태(오류) -->
-  <div class="notice" style="background:#fff7e6;border-color:#ffe7b3;color:#7a5200;">
-    현재 등업 처리 상태를 확인할 수 없습니다. 잠시 후 다시 시도하거나 관리자에게 문의하세요.
-  </div>
+<div style="background:#e6f4ea; color:#137333; padding:12px; border-radius:6px; margin-bottom:16px; border:1px solid #c6e0d0;">
+  <strong>알림:</strong> <%= msg %>
+</div>
 <%
 }
 %>
 
+<div class="container">
+  <h2>인플루언서 등업 신청 목록 (관리자)</h2>
+
+    <form method="post" action="<%= request.getContextPath() %>/admin/influencerBatchProcess.jsp">
+    <div class="toolbar">
+      사용자ID:
+      <input type="text" name="q_user_id" value="<%= (q_user_id==null) ? "" : q_user_id %>">
+      상태:
+      <select name="q_status">
+        <option value="">전체</option>
+        <option value="pending" <%= "pending".equals(q_status) ? "selected" : "" %>>대기</option>
+        <option value="approved" <%= "approved".equals(q_status) ? "selected" : "" %>>승인</option>
+        <option value="rejected" <%= "rejected".equals(q_status) ? "selected" : "" %>>반려</option>
+      </select>
+
+      정렬(요청일):
+      <select name="sortDir">
+        <option value="desc" <%= "desc".equalsIgnoreCase(sortDir) ? "selected" : "" %>>최신순(내림)</option>
+        <option value="asc" <%= "asc".equalsIgnoreCase(sortDir) ? "selected" : "" %>>오래된순(오름)</option>
+      </select>
+
+      <input type="submit" value="검색/정렬" formaction="">
+      <span class="small">ID는 관리자 화면에 표시하지 않습니다.</span>
+
+      <!-- 일괄 처리 버튼은 테이블 아래에도 배치 -->
+    </div>
+
+    <table class="table" role="table" aria-label="인플루언서 신청 목록">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAll" title="모두 선택"></th>
+          <th>사용자ID</th>
+          <th>요청등급</th>
+          <th>사유</th>
+          <th>SNS URLs</th>
+          <th>상태</th>
+          <th>요청일</th>
+          <th>처리자</th>
+          <th>처리일</th>
+          <th>관리자 메모</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%
+          if (pageList == null || pageList.isEmpty()) {
+        %>
+          <tr><td colspan="10" style="text-align:center; color:#666;">신청 내역이 없습니다.</td></tr>
+        <%
+          } else {
+            for (InfluencerRequestDTO dto : pageList) {
+        %>
+          <tr>
+            <td style="text-align:center;">
+              <input type="checkbox" name="selectedIds" value="<%= dto.getId() %>">
+            </td>
+            <td><%= dto.getUser_id() %></td>
+            <td><%= dto.getRequested_grade() %></td>
+            <td><%= dto.getReason() != null ? dto.getReason().replaceAll("\n","<br/>") : "" %></td>
+            <td><%= dto.getSns_urls() %></td>
+            <td><%= dto.getStatus() %></td>
+            <td><%= dto.getRequested_at() %></td>
+            <td><%= dto.getProcessed_by() %></td>
+            <td><%= dto.getProcessed_at() %></td>
+            <td><%= dto.getAdmin_note() != null ? dto.getAdmin_note().replaceAll("\n","<br/>") : "" %></td>
+          </tr>
+        <%
+            }
+          }
+        %>
+      </tbody>
+    </table>
+
+    <div style="margin-top:12px;">
+      <button type="submit" name="action" value="approved">선택 승인</button>
+      <button type="submit" name="action" value="rejected">선택 반려</button>
+      <button type="submit" name="action" value="approved_all" onclick="return confirm('전체 신청을 승인하시겠습니까?');">전체 승인</button>
+    </div>
+  </form>
+
+  <div class="pager" role="navigation" aria-label="페이지 네비게이션">
+    <%
+      if (curPage > 1) {
+    %>
+      <a href="<%= baseUrl %>pageNum=<%= curPage-1 %>">이전</a>
+    <%
+      }
+      for (int i = startPage; i <= endPage; i++) {
+        if (i == curPage) {
+    %>
+      <strong><%= i %></strong>
+    <%
+        } else {
+    %>
+      <a href="<%= baseUrl %>pageNum=<%= i %>"><%= i %></a>
+    <%
+        }
+      }
+      if (curPage < totalPage) {
+    %>
+      <a href="<%= baseUrl %>pageNum=<%= curPage+1 %>">다음</a>
+    <%
+      }
+    %>
+  </div>
+
+  <div style="margin-top:12px;">
+    <a href="<%= request.getContextPath() %>/admin/dashboard.jsp">관리자 페이지로 돌아가기</a>
+  </div>
 </div>
 </body>
+
+<script>
+(function(){
+  const form = document.querySelector('form[action$="/admin/influencerBatchProcess.jsp"]');
+  form.addEventListener('submit', function(e){
+    const action = (e.submitter && e.submitter.name === 'action') ? e.submitter.value : null;
+    if (action !== 'approved') return;
+
+    const checked = Array.from(form.querySelectorAll('input[name="selectedIds"]:checked'));
+    if (checked.length === 0) {
+      e.preventDefault();
+      alert('하나 이상 선택하세요.');
+      return;
+    }
+    if (checked.length === 1) {
+      e.preventDefault();
+      const requestId = checked[0].value; // ✅ id 값
+      if (!requestId) {
+        alert('신청 ID를 찾을 수 없습니다.');
+        return;
+      }
+      // ✅ id 기반으로 이동
+      const url = '<%= request.getContextPath() %>/admin/influencerApproveForm.jsp?id=' + encodeURIComponent(requestId);
+      window.location.href = url;
+    }
+    // 2건 이상이면 폼 제출 (일괄 처리)
+  });
+
+  // 전체 선택 체크박스 기능
+  const selectAll = document.getElementById('selectAll');
+  if (selectAll) {
+    selectAll.addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
+      checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+  }
+})();
+</script>
+
 </html>

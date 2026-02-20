@@ -1,3 +1,4 @@
+<%@page import="sm.data.InfluencerRequestDAO"%>
 <%@ page import="sm.data.AdminDAO" %>
 <%@ page import="sm.data.StatsDTO" %>
 <%@ page import="java.util.*" %>
@@ -49,7 +50,26 @@
 <body>
 <div class="container">
 <%
-    // Admin 체크 필요 시 추가
+	// 세션에서 grade 안전하게 읽기
+	int grade = 0;
+	Object gradeObj = session.getAttribute("grade");
+	if (gradeObj != null) {
+    	try {
+        	if (gradeObj instanceof Number) {
+        		grade = ((Number) gradeObj).intValue();
+        	}else grade = Integer.parseInt(gradeObj.toString());
+    	} catch (Exception e) {
+        	grade = 0;
+    	}
+	}
+
+// grade가 0이 아니면 메인으로 이동
+if (grade != 0) {
+    response.sendRedirect(request.getContextPath() + "/main/main.jsp");
+    return;
+}
+
+	// Admin 체크 필요 시 추가
     AdminDAO dao = AdminDAO.getInstance();
     String searchQuery = request.getParameter("searchQuery");
 
@@ -59,6 +79,9 @@
     int activeMembers = dao.getCountByStatus("ACTIVE", searchQuery);
     int deactiveMembers = dao.getCountByStatus("DEACTIVE", searchQuery);
     int emailVerified = dao.getEmailVerifiedCount(searchQuery);
+    
+    InfluencerRequestDAO infDao = InfluencerRequestDAO.getInstance();
+    int pendingRequests = infDao.getInfluencerRequestCountByStatus("PENDING");
 
     //상점 신청 파람 받기 후속 작업 필요시 작업
     String name = request.getParameter("name");
@@ -74,6 +97,7 @@
   	<button type="button" onclick="document.location.href='/summat/admin/memberList.jsp'">리스트로</button>
   	<button type="button" onclick="document.location.href='/summat/main/main.jsp'">메인으로</button>
   	<button type="button" onclick="document.location.href='/summat/store/storeAdmin.jsp'">상점신청승인페이지</button>
+  	<button type="button" onclick="document.location.href='/summat/admin/influencerConfirm.jsp'">인플루언서 신청 확인</button>
   </div>
   <!-- 검색 폼 -->
   <form class="search-form" method="get" action="dashboard.jsp">
@@ -81,6 +105,14 @@
     <button type="submit">검색</button>
     <a class="reset" href="dashboard.jsp">전체</a>
   </form>
+</div>
+
+<div class="stat-card" title="인플루언서 신청 대기">
+  <div class="icon verified">P</div>
+  <div class="meta">
+    <div class="label">신청 대기 (PENDING)</div>
+    <div class="value"><%= pendingRequests %></div>
+  </div>
 </div>
 
 <!-- 상단 요약 카드 -->

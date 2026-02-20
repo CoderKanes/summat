@@ -54,7 +54,7 @@ function showError(msg) {
 <div class="card">
   <h2>인플루언서 등업 신청</h2>
 
-  <form name="upgradeForm" method="post" action="/summat/admin/influencerConfirm.jsp" onsubmit="event.preventDefault(); validateAndSubmit(this);">
+  <form name="upgradeForm" method="post" action="/summat/user/influencerUpgradePro.jsp" onsubmit="event.preventDefault(); validateAndSubmit(this);">
     <div class="row">
       <label>아이디</label>
       <div class="user-id"><%= (user_id != null) ? user_id : "" %></div>
