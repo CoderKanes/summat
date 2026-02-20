@@ -14,7 +14,7 @@ import java.util.List;
  */
 
 public class BoardDAO {
-	// DB 연결 객체
+	
 	private Connection conn;
 	private PreparedStatement pstmt;
 	private ResultSet rs;

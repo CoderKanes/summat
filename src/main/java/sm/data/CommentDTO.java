@@ -3,12 +3,20 @@ package sm.data;
 import java.util.Date;
 
 public class CommentDTO {
+	private int postId;
     private int id;
     private int board_Num;
     private String password;
     private String writer;
     private String content;
     private Date regDate;
+       
+	public int getPostId() {
+		return postId;
+	}
+	public void setPostId(int postId) {
+		this.postId = postId;
+	}
 	public int getId() {
 		return id;
 	}
@@ -45,5 +53,4 @@ public class CommentDTO {
 	public void setRegDate(Date regDate) {
 		this.regDate = regDate;
 	}
-
 }

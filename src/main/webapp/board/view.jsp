@@ -98,12 +98,16 @@ function deletePost(num) {
 <h3>내용</h3>
 <p><%= board.getContent() %></p>
 <hr>
+
+
     <%-- 8️ 댓글 목록 가져오기 --%>
 <h3>댓글</h3>
 <%
     CommentDAO cdao = new CommentDAO();
     List<CommentDTO> comments = cdao.getCommentsByBoard_Num(board.getNum());
 %>
+
+
     <%-- 9️ 댓글 출력 --%>
 <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
 <% for(CommentDTO c : comments) { %>
@@ -115,7 +119,9 @@ function deletePost(num) {
 </div>
     <%-- 10️ 댓글 작성 폼 --%>
 <form action="comment_insert.jsp" method="post">
+
     <input type="hidden" name="board_Num" value="<%=board.getNum()%>">
+    
     작성자: <input type="text" name="writer" required><br>
     비밀번호: <input type="password" name="password" required><br>
     내용:<textarea name="content" rows="3" cols="50" required></textarea><br>
