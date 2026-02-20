@@ -106,6 +106,37 @@ public class StoreDAO {
 		return result;
 	}
 	
+	public List<StoreDTO> GetStoresByName(String searchName) {
+		List<StoreDTO> result = new ArrayList<StoreDTO>();
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "select * from store where name like ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%" + searchName + "%");
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				StoreDTO dto = new StoreDTO();				
+				dto.setId(rs.getInt("id"));
+				dto.setName(rs.getString("name"));
+				dto.setPhone(rs.getString("phone"));
+				dto.setAddress(rs.getString("address"));
+				dto.setStatus(rs.getInt("status"));
+				dto.setCreated_at(rs.getTimestamp("created_at"));
+				
+				result.add(dto);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+		
+		return result;
+	}
+	
 	public List<StoreDTO> GetUnregistedStores() {
 		List<StoreDTO> result = new ArrayList<StoreDTO>();
 		try {

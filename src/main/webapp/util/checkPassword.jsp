@@ -8,7 +8,14 @@
 
 <%
     String href = request.getParameter("next");
-	boolean bLogin = (session.getAttribute("sid") != null);
+	
+    Boolean isAuth = null;
+	if (session != null) {
+    	Object authAttr = session.getAttribute("authenticated");
+    	isAuth = (authAttr instanceof Boolean) ? (Boolean) authAttr : null;
+	}
+	
+	String sid= (String)session.getAttribute("sid");
 %>
 
 <!DOCTYPE html>
@@ -89,6 +96,15 @@
     <div class="password-card">
         <h2>비밀번호 확인</h2>
         
+       
+       <%if(isAuth == null || sid == null || sid.isEmpty()){%>
+        	 <p>로그인정보를 확인 할 수 없습니다. <br/>이 작업을 진행하려면 로그인 정보가 필요합니다. </p>
+          	    <div class="password-actions">
+                 <button class="confirm" type="button" onclick="location.href='/summat/main/main.jsp'">홈으로</button>
+                 <button class="cancel" type="button" onclick="history.back()">이전페이지로</button>
+             </div>
+       <% }else{%>        
+        
         <p>이 작업을 진행하려면 비밀번호를 입력하세요.</p>
         <input type="password" id="password" placeholder="비밀번호 입력" autofocus>
 	
@@ -96,6 +112,7 @@
             <button class="confirm" type="button" onclick="checkPassword()">확인</button>
             <button class="cancel" type="button" onclick="history.back()">취소</button>
         </div>
+        <% }%>
     </div>
 </div>
 

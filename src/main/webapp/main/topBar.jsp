@@ -116,4 +116,8 @@
       }
     });
   });
+  
+  function login() {
+	  location.href="/summat/user/loginForm.jsp";
+	}
 </script>

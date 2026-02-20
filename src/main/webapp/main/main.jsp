@@ -36,8 +36,6 @@
 		</main>
 	</div>
 
-	<!-- 플로팅 버튼 -->
-	<div class="fab" id="fab" onclick="writePost()">✏️</div>
 
 	<script>
 /* ===== THEME ===== */
@@ -59,23 +57,7 @@ function changeTheme() {
   document.documentElement.style.setProperty('--point', t.point);
 }
 
-/* ===== BUTTON ACTION ===== */
 
-function writePost() {
-  alert("리뷰 작성 페이지로 이동 (임시)");
-}
-function login() {
-  location.href="/summat/user/loginForm.jsp";
-}
-
-/* ===== FLOATING BUTTON LOGIC ===== */
-const main = document.getElementById("mainContent");
-const fab = document.getElementById("fab");
-if (main && fab) {
-    main.addEventListener("scroll", () => {
-      fab.style.display = main.scrollTop > 200 ? "flex" : "none";
-    });
-}
 </script>
 
 </body>

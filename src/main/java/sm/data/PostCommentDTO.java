@@ -1,6 +1,7 @@
 package sm.data;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class PostCommentDTO {
 	private int id;
@@ -63,22 +64,6 @@ public class PostCommentDTO {
 		this.content = content;
 	}
 
-	public int getLikeCount() {
-		return likeCount;
-	}
-
-	public void setLikeCount(int likeCount) {
-		this.likeCount = likeCount;
-	}
-
-	public int getDislikeCount() {
-		return dislikeCount;
-	}
-
-	public void setDislikeCount(int dislikeCount) {
-		this.dislikeCount = dislikeCount;
-	}
-
 	public Timestamp getCreated_at() {
 		return created_at;
 	}
@@ -114,5 +99,21 @@ public class PostCommentDTO {
 			writer = guestName;
 		}		
 		return writer;
-		}
+	}
+	
+	public List<PostCommentDTO> getReplies() {
+		PostDAO pdao = new PostDAO();
+		List<PostCommentDTO> subComments = pdao.getSubPostComments(postNum, id);				
+		return subComments;
+	}
+	
+	public int getLikes() {
+		PostDAO pdao = new PostDAO();			
+		return pdao.GetTotalLike(id);
+	}
+	
+	public int getDislikes() {
+		PostDAO pdao = new PostDAO();			
+		return pdao.GetTotalDislike(id);
+	}
 }

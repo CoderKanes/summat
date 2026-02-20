@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="sm.data.StoreDAO"%>
+<%@ page import="sm.data.StoreDTO"%>
+<%@ page import="sm.data.MenuDAO"%>
+<%@ page import="sm.data.MenuDTO"%>
     
 <%--
     작성자 : 김용진
@@ -12,6 +16,7 @@
 <link href="/summat/resources/css/style.css" rel="stylesheet" />
 <link href="/summat/resources/css/post/postEdit.css" rel="stylesheet" />
 
+
 <main class="post-edit-page">
 
     <div class="form-container">
@@ -19,10 +24,17 @@
 
         <jsp:useBean id="dao" class="sm.data.PostDAO" />
         <%
-            String user_id = "test";
+	        Boolean isAuth = null;
+	    	if (session != null) {
+	        	Object authAttr = session.getAttribute("authenticated");
+	        	isAuth = (authAttr instanceof Boolean) ? (Boolean) authAttr : null;
+	    	}
+	    	
+	    	String sid= (String)session.getAttribute("sid");
+            String user_id = sid;
         %>
 
-        <form action="postWritePro.jsp" method="post" onsubmit="return beforeSubmit();">
+        <form id="writeForm" action="postWritePro.jsp" method="post" onsubmit="return beforeSubmit();">
 
             <label class="field-label">제목</label>
             <input type="text" name="title" class="input-title" required>
@@ -36,6 +48,12 @@
 
             <label class="field-label">이미지 선택</label>
             <input type="file" id="imageInput" multiple accept="image/*">
+            
+            <label class="field-label">방문 가게/메뉴 등록</label>
+			<div class="store-search-row"> 
+			    <input type="button" id="findStoreBtn" value="매장찾기">
+			    <div id="resultDisplay"></div> 
+			</div>
 
             <div class="form-actions">
                 <button type="submit" class="theme-btn confirmbtn-minSize">작성완료</button>

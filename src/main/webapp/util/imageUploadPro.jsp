@@ -16,11 +16,18 @@
 	
 	FileDAO dao = new FileDAO();
 	List<String> CleanupFiles = dao.getCleanupFileList();
-	for(String fname : CleanupFiles)
+	String contextPath = request.getContextPath(); 
+	for(String fileUrl  : CleanupFiles)
 	{
-		File f = new File(fname);
-		if(!f.delete()) {
-		   System.out.println("파일 삭제 실패: " + f.getAbsolutePath());
+		String relativePath = fileUrl.substring(contextPath.length());
+		String realPath = request.getServletContext().getRealPath(relativePath); 
+		if (realPath != null) {
+			File f = new File(realPath);
+		    if(f.exists() && f.delete()) {
+                System.out.println("파일 삭제 성공: " + realPath);
+            } else {
+                System.out.println("파일 삭제 실패 (존재하지 않거나 권한 부족): " + realPath);
+            }
 		}
 	}
 

@@ -17,7 +17,8 @@
 <h1>post modify Pro</h1>
 
 <%
-	
+	String storeId = request.getParameter("storeId");
+	String[] menus = request.getParameterValues("menus");
 	
 	int postNum =0;
 	if(request.getParameter("postNum") !=null){
@@ -27,7 +28,8 @@
 		%>
 		<h2>request postnum is null %></h2>
 		<%		
-	}		
+	}
+	String pageNumParam = request.getParameter("pageNum");
 	
 	%>
 	<h2> postNum : <%=postNum %> , dto.pnum : <%=dto.getPostNum() %></h2>
@@ -49,11 +51,11 @@
 		fdao.updateFileStatus(fname, FileDAO.FileStatus.INUSE);
 	}		
 
-	boolean modifyResult =dao.updatePost(dto);
+	boolean modifyResult =dao.updatePost(dto, storeId, menus);
 	%>
 	<h2> 수정결과 : <%=modifyResult %></h2>
 	<%		
 	
 
-    response.sendRedirect("postView.jsp?postNum="+postNum);	
+    response.sendRedirect("postView.jsp?postNum="+postNum+"&pageNum="+pageNumParam);	
 %>

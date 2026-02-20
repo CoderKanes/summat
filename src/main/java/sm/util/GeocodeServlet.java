@@ -22,6 +22,7 @@ public class GeocodeServlet extends HttpServlet {
             URLEncoder.encode(q, "UTF-8");
 
         URL url = new URL(urlStr);
+        System.out.println(url.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("User-Agent", "my-map-app"); // ★ 중요

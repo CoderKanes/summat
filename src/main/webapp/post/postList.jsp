@@ -6,6 +6,8 @@
 <%@ page import="sm.util.HTMLUtil" %>
 <%@ page import="sm.data.PostQueryCondition" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     작성자 : 김용진
@@ -31,6 +33,25 @@
 		    }
 		}
 	}	
+	String MenuIdParam = request.getParameter("MenuId");
+	if(MenuIdParam != null)	{
+		QrCondition.setByMenuId(Integer.parseInt(MenuIdParam));
+	}
+	
+	String StoreIdParam = request.getParameter("StoreId");
+	if(StoreIdParam != null)	{
+		QrCondition.setByStoreId(Integer.parseInt(StoreIdParam));
+	}
+	
+	
+	String[] roleStrings = request.getParameterValues("userRole");
+	if (roleStrings != null && roleStrings.length > 0) {
+	    List<PostQueryCondition.UserRole> roleList = Arrays.stream(roleStrings)
+	                                    .map(PostQueryCondition.UserRole::valueOf)
+	                                    .collect(Collectors.toList());
+	    QrCondition.setUserRoleFilters(roleList);
+	}
+	
 	String pageNum = request.getParameter("pageNum");
 	int currentPage= pageNum!=null? Integer.parseInt(pageNum) : 1;	
 	
@@ -42,6 +63,14 @@
 	int endRow = currentPage * pageElementCount;
 
 	List<PostDTO> postList = dao.selectPostList(startRow, endRow, QrCondition);
+	
+    Boolean isAuth = null;
+  	if (session != null) {
+      	Object authAttr = session.getAttribute("authenticated");
+      	isAuth = (authAttr instanceof Boolean) ? (Boolean) authAttr : null;
+  	}
+  	
+  	String sid= (String)session.getAttribute("sid");
 	
 %>	
 
@@ -55,7 +84,7 @@
 		{		
 			String dtoContentTextOnly = HTMLUtil.htmlContentToPlainText(dto.getContent(), false);
 %>
-			<a href="/summat/post/postView.jsp?postNum=<%=dto.getPostNum()%>"> 
+			<a href="/summat/post/postView.jsp?postNum=<%=dto.getPostNum()%>&pageNum=<%=currentPage%>"> 
 				<div class="postcard" onclick="location.href='postView.jsp?postNum=<%=dto.getPostNum()%>';">
 					<div class="postcard-imagebox">
 						<img class="postcard-image" src="<%=dto.getThumbnailImage()%>">
@@ -72,7 +101,9 @@
 		}
 	}
 %>
+	<% if(!(isAuth == null || sid==null || sid.isEmpty())){%>
 		<a href="/summat/post/postWrite.jsp"> 포스트 쓰기 </a>
+	<%} %>
 <%
 //calculate pageNav
 		int LastPage = (int) Math.ceil(totalElementCount / (double) pageElementCount);

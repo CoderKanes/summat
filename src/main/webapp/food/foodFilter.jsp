@@ -2,9 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ page import="sm.data.MenuCategoryDAO"%>
 <%@ page import="java.util.Map"%>
-<html>
-<head>
-<title>음식 검색</title>
+
 <style>
   .tabs button { margin-right: 10px; }
   .column { float: left; width: 30%; border: 1px solid #ddd; min-height: 200px; max-height: 200px; overflow-y: auto; padding: 10px; }
@@ -71,11 +69,6 @@ function loadDetail(dish) {
     </ul>`;
 }
 </script>
-</head>
-
-<body>
-
-<h2>음식 검색</h2>
 
 <!-- 상단 탭 -->
 <div class="tabs">
@@ -92,5 +85,3 @@ function loadDetail(dish) {
 
 <div class="clear"></div>
 
-</body>
-</html>

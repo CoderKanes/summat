@@ -15,16 +15,25 @@
 <h1>post write Pro</h1>
 
 <%
+	String storeId = request.getParameter("storeId");
+	String[] menus = request.getParameterValues("menus");
+
     // DB 저장
-    dao.insertPost(dto);
+    boolean success = dao.insertPost(dto, storeId, menus);
+    
+    if(success) {
+    	FileDAO fdao = new FileDAO();
+    	List<String> imageFiles = HTMLUtil.extractAllImgSrc(dto.getContent());
+    	for(String fname : imageFiles)
+    	{
+    		fdao.updateFileStatus(fname, FileDAO.FileStatus.INUSE);
+    	}
 
-	FileDAO fdao = new FileDAO();
-	List<String> imageFiles = HTMLUtil.extractAllImgSrc(dto.getContent());
-	for(String fname : imageFiles)
-	{
-		fdao.updateFileStatus(fname, FileDAO.FileStatus.INUSE);
-	}
+        response.sendRedirect("postMain.jsp");
+    } else {
+        out.println("<script>alert('저장에 실패했습니다. 다시시도해주세요.'); history.back();</script>");
+    }
 
-    response.sendRedirect("postMain.jsp");
+
 	
 %>

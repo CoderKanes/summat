@@ -130,9 +130,7 @@ function submitMenu() {
         cultureCategory: cultureCategory,
         foodTypes: foodTypes,
         foodItems: selectedFood
-    };
-    
-    alert(menu.foodTypes);
+    };  
 
     window.opener.saveMenu(menu);
     window.close();

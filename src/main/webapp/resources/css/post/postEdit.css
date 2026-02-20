@@ -83,3 +83,18 @@ img.preview {
   font-size: 14px;
   border-radius: 8px;
 }
+
+/* 버튼과 결과창을 가로로 정렬 */
+.store-search-row {
+    display: flex;
+    align-items: center; /* 버튼과 텍스트의 높이 중앙 정렬 */
+    gap: 15px;           /* 버튼과 결과창 사이의 간격 */
+    margin-top: 5px;
+}
+
+/* 결과창 내부 텍스트 스타일 (선택사항) */
+#resultDisplay {
+    font-size: 0.95rem;
+    color: #333;
+    white-space: nowrap; /* 내용이 길어져도 줄바꿈 방지 (필요시) */
+}

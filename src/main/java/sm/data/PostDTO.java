@@ -1,6 +1,9 @@
 package sm.data;
 
 import java.sql.Timestamp;
+import java.util.List;
+
+import sm.util.HTMLUtil;
 
 /*
  * 작성자 : 김용진
@@ -41,6 +44,16 @@ public class PostDTO {
 		this.content = content;
 	}
 	public String getThumbnailImage() {
+		
+		if(thumbnailImage == null || thumbnailImage.isEmpty())
+		{
+			List<String> ImgSrcs = HTMLUtil.extractAllImgSrc(content);
+			if(!ImgSrcs.isEmpty())
+			{
+				return ImgSrcs.getFirst();
+			}
+		}
+		
 		return thumbnailImage;
 	}
 	public void setThumbnailImage(String thumbnailImage) {
