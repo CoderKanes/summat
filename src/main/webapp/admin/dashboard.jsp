@@ -1,7 +1,6 @@
 <%@page import="sm.data.InfluencerRequestDAO"%>
 <%@ page import="sm.data.AdminDAO" %>
 <%@ page import="sm.data.StatsDTO" %>
-<%@ page import="java.util.*" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -21,25 +20,71 @@
 .search-form a.reset { margin-left:8px; font-size:13px; color:#666; text-decoration:none; }
 
 /* 카드 그리드 */
-.stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; width:100%; max-width:980px; }
+.stats-grid { 
+    display:grid; 
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+    gap:12px; 
+    width:100%; 
+    max-width:980px; 
+}
 
 /* 단일 카드 */
-.stat-card { display:flex; align-items:center; gap:12px; background:linear-gradient(180deg,#fff,#fbfdff); border:1px solid #e6eefc; padding:10px 14px; border-radius:10px; box-shadow:0 6px 18px rgba(50,80,160,0.06); min-width:160px; }
-.icon { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+.stat-card { 
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    background:linear-gradient(180deg,#fff,#fbfdff); 
+    border:1px solid #e6eefc; 
+    padding:10px 14px; 
+    border-radius:10px; 
+    box-shadow:0 6px 18px rgba(50,80,160,0.06); 
+    min-width:160px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(50,80,160,0.12);
+}
+
+.icon { 
+    width:44px; height:44px; 
+    border-radius:50%; 
+    display:flex; align-items:center; justify-content:center; 
+    color:#fff; font-weight:700; 
+    box-shadow:0 4px 10px rgba(0,0,0,0.08); 
+}
 .icon.total { background: linear-gradient(135deg,#4f6bd9,#6e8bf3); }
 .icon.active { background: linear-gradient(135deg,#28a745,#49c26d); }
 .icon.deactive { background: linear-gradient(135deg,#e24b4b,#ff7b7b); }
 .icon.verified { background: linear-gradient(135deg,#f59e0b,#fbbf24); }
 .icon.male { background: linear-gradient(135deg,#3b82f6,#60a5fa); }
 .icon.female { background: linear-gradient(135deg,#ec4899,#fb7185); }
+.icon.pending { background: linear-gradient(135deg,#8b5cf6,#a78bfa); } /* 보라색 계열 - 대기 중 느낌 */
 
-.stat-card .meta { display:flex; flex-direction:column; line-height:1; }
-.stat-card .meta .label { font-size:12px; color:#55607a; }
-.stat-card .meta .value { font-size:18px; font-weight:700; color:#1f3b8a; }
+.stat-card .meta { 
+    display:flex; flex-direction:column; line-height:1; 
+}
+.stat-card .meta .label { 
+    font-size:12px; color:#55607a; 
+}
+.stat-card .meta .value { 
+    font-size:18px; font-weight:700; color:#1f3b8a; 
+}
 
 /* 연령대 카드 내부 정렬 */
-.age-grid { display:flex; gap:10px; flex-wrap:wrap; }
-.age-item { min-width:120px; display:flex; flex-direction:column; gap:6px; padding:8px 10px; border-radius:8px; background:#fff; border:1px solid #eef3fb; box-shadow:0 4px 10px rgba(50,80,160,0.03); }
+.age-grid { 
+    display:flex; gap:10px; flex-wrap:wrap; 
+}
+.age-item { 
+    min-width:120px; 
+    display:flex; flex-direction:column; gap:6px; 
+    padding:8px 10px; 
+    border-radius:8px; 
+    background:#fff; 
+    border:1px solid #eef3fb; 
+    box-shadow:0 4px 10px rgba(50,80,160,0.03); 
+}
 
 @media (max-width:560px) {
   .header-row { flex-direction:column; align-items:flex-start; gap:10px; }
@@ -57,47 +102,41 @@
     	try {
         	if (gradeObj instanceof Number) {
         		grade = ((Number) gradeObj).intValue();
-        	}else grade = Integer.parseInt(gradeObj.toString());
+        	} else {
+        		grade = Integer.parseInt(gradeObj.toString());
+        	}
     	} catch (Exception e) {
         	grade = 0;
     	}
 	}
 
-// grade가 0이 아니면 메인으로 이동
-if (grade != 0) {
-    response.sendRedirect(request.getContextPath() + "/main/main.jsp");
-    return;
-}
+	// grade가 0이 아니면 메인으로 이동 (관리자만 접근 가능)
+	if (grade != 0) {
+	    response.sendRedirect(request.getContextPath() + "/main/main.jsp");
+	    return;
+	}
 
-	// Admin 체크 필요 시 추가
-    AdminDAO dao = AdminDAO.getInstance();
-    String searchQuery = request.getParameter("searchQuery");
+	AdminDAO dao = AdminDAO.getInstance();
+	String searchQuery = request.getParameter("searchQuery");
 
-    // 통계 및 기본 카운트 (DAO는 searchQuery 파라미터를 사용해 필터링한다고 가정)
-    StatsDTO sdto = dao.getStats(searchQuery); // 성별/연령 통계
-    int totalMembers = dao.getAllCount(searchQuery);
-    int activeMembers = dao.getCountByStatus("ACTIVE", searchQuery);
-    int deactiveMembers = dao.getCountByStatus("DEACTIVE", searchQuery);
-    int emailVerified = dao.getEmailVerifiedCount(searchQuery);
-    
-    InfluencerRequestDAO infDao = InfluencerRequestDAO.getInstance();
-    int pendingRequests = infDao.getInfluencerRequestCountByStatus("PENDING");
-
-    //상점 신청 파람 받기 후속 작업 필요시 작업
-    String name = request.getParameter("name");
-    String address = request.getParameter("address");
-    String phone = request.getParameter("phoneNum");
-    String menuData = request.getParameter("menuData");
-    
+	// 통계 및 기본 카운트
+	StatsDTO sdto = dao.getStats(searchQuery);
+	int totalMembers = dao.getAllCount(searchQuery);
+	int activeMembers = dao.getCountByStatus("ACTIVE", searchQuery);
+	int deactiveMembers = dao.getCountByStatus("DEACTIVE", searchQuery);
+	int emailVerified = dao.getEmailVerifiedCount(searchQuery);
+	
+	InfluencerRequestDAO infDao = InfluencerRequestDAO.getInstance();
+	int pendingRequests = infDao.getInfluencerRequestCountByStatus("PENDING");
 %>
 
 <div class="header-row">
   <div class="page-title">
   	관리자 대시보드
-  	<button type="button" onclick="document.location.href='/summat/admin/memberList.jsp'">리스트로</button>
-  	<button type="button" onclick="document.location.href='/summat/main/main.jsp'">메인으로</button>
-  	<button type="button" onclick="document.location.href='/summat/store/storeAdmin.jsp'">상점신청승인페이지</button>
-  	<button type="button" onclick="document.location.href='/summat/admin/influencerConfirm.jsp'">인플루언서 신청 확인</button>
+  	<button type="button" onclick="location.href='<%= request.getContextPath() %>/admin/memberList.jsp'">리스트로</button>
+  	<button type="button" onclick="location.href='<%= request.getContextPath() %>/main/main.jsp'">메인으로</button>
+  	<button type="button" onclick="location.href='<%= request.getContextPath() %>/store/storeAdmin.jsp'">상점신청승인페이지</button>
+  	<!-- 인플루언서 확인 버튼은 이제 카드 클릭으로 대체되므로 선택적으로 유지 -->
   </div>
   <!-- 검색 폼 -->
   <form class="search-form" method="get" action="dashboard.jsp">
@@ -107,15 +146,7 @@ if (grade != 0) {
   </form>
 </div>
 
-<div class="stat-card" title="인플루언서 신청 대기">
-  <div class="icon verified">P</div>
-  <div class="meta">
-    <div class="label">신청 대기 (PENDING)</div>
-    <div class="value"><%= pendingRequests %></div>
-  </div>
-</div>
-
-<!-- 상단 요약 카드 -->
+<!-- 상단 요약 카드 (인플루언서 신청 포함) -->
 <div class="stats-grid" style="margin-bottom:14px;">
   <div class="stat-card" title="총 회원수">
     <div class="icon total">U</div>
@@ -148,6 +179,17 @@ if (grade != 0) {
       <div class="value"><%= emailVerified %></div>
     </div>
   </div>
+
+  <!-- ✅ 인플루언서 신청 대기 카드 - 클릭 시 이동 -->
+  <a href="<%= request.getContextPath() %>/admin/influencerConfirm.jsp" style="text-decoration: none; color: inherit;">
+    <div class="stat-card" title="인플루언서 신청 대기 (PENDING)">
+      <div class="icon pending">P</div>
+      <div class="meta">
+        <div class="label">인플루언서 신청</div>
+        <div class="value"><%= pendingRequests %></div>
+      </div>
+    </div>
+  </a>
 </div>
 
 <!-- 성별 통계 -->

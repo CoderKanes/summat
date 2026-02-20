@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.Arrays, javax.servlet.http.HttpServletResponse" %>
+<%@ page import="java.util.Arrays, java.util.List, javax.servlet.http.HttpServletResponse" %>
 <%@ page import="sm.data.InfluencerRequestDAO" %>
+<%@ page import="sm.data.AdminDAO" %> <!-- ✅ 추가 -->
 <%
 request.setCharacterEncoding("UTF-8");
 
@@ -31,27 +32,56 @@ if (grade != 0) {
 // === 2. 파라미터 받기 ===
 String action = request.getParameter("action");
 String[] selectedIds = request.getParameterValues("selectedIds");
-String adminNote = "일괄 처리됨"; // 추후 폼에서 입력받도록 확장 가능
+String adminNote = "일괄 처리됨";
 
-InfluencerRequestDAO dao = InfluencerRequestDAO.getInstance();
+InfluencerRequestDAO infDao = InfluencerRequestDAO.getInstance();
+AdminDAO adminDao = AdminDAO.getInstance(); // ✅ 추가
+
 int successCount = 0;
 
 try {
-    if ("approved_all".equals(action)) {
-        // 전체 승인: PENDING 상태인 모든 신청 승인
-        successCount = dao.approveAllPending(adminId, adminNote);
+	if ("APPROVED_ALL".equals(action)) {
+        // 🔸 1. 전체 승인: 요청 상태 변경
+        int updatedRequests = infDao.approveAllPending(adminId, adminNote);
         
-    } else if ("approved".equals(action) || "rejected".equals(action)) {
-        // 선택 승인 또는 선택 반려
+        // 🔸 2. PENDING 사용자 ID 목록 가져오기
+        List<String> pendingUserIds = infDao.getAllPendingUserIds();
+        
+        // 🔸 3. 각 사용자의 grade = 2 로 업데이트
+        int updatedGrades = 0;
+        for (String user_id : pendingUserIds) {
+            if (user_id != null && !user_id.trim().isEmpty()) {
+                int result = adminDao.setGrade(user_id, 2);
+                if (result > 0) updatedGrades++;
+            }
+        }
+        
+        successCount = Math.min(updatedRequests, updatedGrades); // 간단한 성공 추정
+
+    } else if ("APPROVED".equals(action) || "REJECTED".equals(action)) {
         if (selectedIds != null && selectedIds.length > 0) {
-            String status = "approved".equals(action) ? "APPROVED" : "REJECTED";
+        	String status = "APPROVED".equals(action) ? "APPROVED" : "REJECTED";
             for (String idStr : selectedIds) {
                 try {
                     int id = Integer.parseInt(idStr.trim());
-                    int result = dao.changeRequestStatusById(id, status, adminId, adminNote);
-                    if (result > 0) successCount++;
+                    
+                    // 🔸 1. 요청 상태 업데이트
+                    int result1 = infDao.changeRequestStatusById(id, status, adminId, adminNote);
+                    
+                    // 🔸 2. 승인일 경우만 grade 업데이트
+                    int result2 = 0;
+                    if ("APPROVED".equals(status)) {
+                        String user_id = infDao.getUser_idById(id);
+                        if (user_id != null && !user_id.trim().isEmpty()) {
+                            result2 = adminDao.setGrade(user_id, 2);
+                        }
+                    }
+                    
+                    if (result1 > 0 && ("REJECTED".equals(status) || result2 > 0)) {
+                        successCount++;
+                    }
                 } catch (NumberFormatException e) {
-                    // 무시 (유효하지 않은 ID)
+                    // 무시
                 }
             }
         }
@@ -60,22 +90,19 @@ try {
         return;
     }
 
-    // 성공 메시지
     String msg = "처리 성공 (" + successCount + "건)";
     if (successCount == 0) msg = "처리할 항목이 없거나 실패했습니다.";
 
-    // Referer로 돌아가기 (필터 유지)
     String referer = request.getHeader("Referer");
-    String redirectUrl = request.getContextPath() + "/admin/dashboard.jsp";
-    if (referer != null && referer.contains("/admin/dashboard.jsp")) {
+    String redirectUrl = request.getContextPath() + "/admin/influencerConfirm.jsp";
+    if (referer != null && referer.contains("/admin/")) {
         redirectUrl = referer;
     }
 
-    // 메시지 전달
     response.sendRedirect(redirectUrl + (redirectUrl.contains("?") ? "&" : "?") + "msg=" + java.net.URLEncoder.encode(msg, "UTF-8"));
 
 } catch (Exception e) {
     e.printStackTrace();
-    response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp?msg=" + java.net.URLEncoder.encode("처리 중 오류 발생", "UTF-8"));
+    response.sendRedirect(request.getContextPath() + "/admin/influencerConfirm.jsp?msg=" + java.net.URLEncoder.encode("처리 중 오류 발생", "UTF-8"));
 }
 %>

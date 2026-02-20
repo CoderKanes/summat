@@ -128,7 +128,7 @@ public class InfluencerRequestDAO {
 			conn = OracleConnection.getConnection();
 			StringBuilder sb = new StringBuilder();
 			sb.append("select count(*) c from  influencer_request where 1=1");
-			if(user_id != null && user_id.trim().isEmpty()) {
+			if(user_id != null && !user_id.trim().isEmpty()) {
 				sb.append("and user_id = ?");
 			}
 			if(status != null && status.trim().isEmpty()) {
@@ -140,7 +140,7 @@ public class InfluencerRequestDAO {
 			pstmt = conn.prepareStatement(sql);
 			
 			int index = 1; 
-			if(user_id != null && user_id.trim().isEmpty()) {
+			if(user_id != null && !user_id.trim().isEmpty()) {
 				pstmt.setString(index++, user_id);
 			}
 			if(status != null && status.trim().isEmpty()) {
@@ -202,6 +202,85 @@ public class InfluencerRequestDAO {
 	    }
 	    return result;
 	}//end
+	
+	//유저 id 받는 메서드
+	// 단일 요청의 user_id 조회
+	public String getUser_idById(int id) {
+	    String user_id = null;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    try {
+	        conn = OracleConnection.getConnection();
+	        String sql = "SELECT user_id FROM influencer_request WHERE id = ?";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, id);
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            user_id = rs.getString("user_id");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        OracleConnection.closeAll(conn, pstmt, rs);
+	    }
+	    return user_id;
+	}
+	
+	// ✅ id로 단일 요청 조회 (추가)
+	public InfluencerRequestDTO getById(int id) {
+	    InfluencerRequestDTO dto = null;
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    try {
+	        conn = OracleConnection.getConnection();
+	        String sql = "SELECT * FROM influencer_request WHERE id = ?";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setInt(1, id);
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            dto = new InfluencerRequestDTO();
+	            dto.setId(rs.getInt("id"));
+	            dto.setUser_id(rs.getString("user_id"));
+	            dto.setRequested_grade(rs.getInt("requested_grade"));
+	            dto.setReason(rs.getString("reason"));
+	            dto.setSns_urls(rs.getString("sns_urls"));
+	            dto.setStatus(rs.getString("status"));
+	            dto.setRequested_at(rs.getTimestamp("requested_at"));
+	            dto.setProcessed_by(rs.getString("processed_by"));
+	            dto.setProcessed_at(rs.getTimestamp("processed_at"));
+	            dto.setAdmin_note(rs.getString("admin_note"));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        OracleConnection.closeAll(conn, pstmt, rs);
+	    }
+	    return dto;
+	}
+
+	// PENDING 상태의 모든 user_id 목록 조회 (전체 승인용)
+	public List<String> getAllPendingUserIds() {
+	    List<String> userIds = new ArrayList<>();
+	    Connection conn = null;
+	    PreparedStatement pstmt = null;
+	    ResultSet rs = null;
+	    try {
+	        conn = OracleConnection.getConnection();
+	        String sql = "SELECT user_id FROM influencer_request WHERE status = 'PENDING'";
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            userIds.add(rs.getString("user_id"));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        OracleConnection.closeAll(conn, pstmt, rs);
+	    }
+	    return userIds;
+	}
 	
 	//모두 승인
 	public int approveAllPending(String processedBy, String adminNote) {

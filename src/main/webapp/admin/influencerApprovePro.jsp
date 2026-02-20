@@ -45,6 +45,6 @@ if (redirectUrl == null || !redirectUrl.contains("/admin/")) {
     redirectUrl = request.getContextPath() + "/admin/influencerList.jsp";
 }
 
-response.sendRedirect(redirectUrl + (redirectUrl.contains("?") ? "&" : "?") + "msg=" + 
-    java.net.URLEncoder.encode(result > 0 ? "승인 완료" : "처리 실패", "UTF-8"));
+String msg = result > 0 ? "승인 완료" : "처리 실패";
+response.sendRedirect("dashboard.jsp");
 %>

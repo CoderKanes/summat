@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List,java.util.ArrayList,java.util.Collections,java.util.Comparator" %>
 <%@ page import="sm.data.InfluencerRequestDTO,sm.data.InfluencerRequestDAO" %>
+<%@ page import="sm.data.AdminDAO" %>
 
 <%
 request.setCharacterEncoding("UTF-8");
@@ -15,15 +16,15 @@ if (userId == null || userId.trim().isEmpty()) {
 // 파라미터 수집
 String q_user_id = request.getParameter("q_user_id");
 String q_status = request.getParameter("q_status");
+// ✅ 핵심 수정: 기본값을 "PENDING" (대문자)로 변경
 if (q_status == null || q_status.trim().isEmpty()) {
-    q_status = "pending"; // 👈 기본값을 "대기 중"으로!
+    q_status = "PENDING"; // 👈 대문자로 통일!
 }
 String sortDirParam = request.getParameter("sortDir"); // "asc" or "desc"
 final String sortDir =
 ("asc".equalsIgnoreCase(sortDirParam) || "desc".equalsIgnoreCase(sortDirParam))
     ? sortDirParam.toLowerCase()
     : "desc";
-
 
 String pageNum = request.getParameter("pageNum");
 if (pageNum == null || pageNum.trim().isEmpty()) pageNum = "1";
@@ -125,16 +126,17 @@ if (!msg.isEmpty()) {
 <div class="container">
   <h2>인플루언서 등업 신청 목록 (관리자)</h2>
 
-    <form method="post" action="<%= request.getContextPath() %>/admin/influencerBatchProcess.jsp">
+    <form method="post" action="<%= request.getContextPath() %>/admin/influencerBatchPro.jsp">
     <div class="toolbar">
       사용자ID:
       <input type="text" name="q_user_id" value="<%= (q_user_id==null) ? "" : q_user_id %>">
       상태:
       <select name="q_status">
         <option value="">전체</option>
-        <option value="pending" <%= "pending".equals(q_status) ? "selected" : "" %>>대기</option>
-        <option value="approved" <%= "approved".equals(q_status) ? "selected" : "" %>>승인</option>
-        <option value="rejected" <%= "rejected".equals(q_status) ? "selected" : "" %>>반려</option>
+        <!-- ✅ 모든 value를 대문자로 통일 -->
+        <option value="PENDING" <%= "PENDING".equals(q_status) ? "selected" : "" %>>대기</option>
+        <option value="APPROVED" <%= "APPROVED".equals(q_status) ? "selected" : "" %>>승인</option>
+        <option value="REJECTED" <%= "REJECTED".equals(q_status) ? "selected" : "" %>>반려</option>
       </select>
 
       정렬(요청일):
@@ -145,8 +147,6 @@ if (!msg.isEmpty()) {
 
       <input type="submit" value="검색/정렬" formaction="">
       <span class="small">ID는 관리자 화면에 표시하지 않습니다.</span>
-
-      <!-- 일괄 처리 버튼은 테이블 아래에도 배치 -->
     </div>
 
     <table class="table" role="table" aria-label="인플루언서 신청 목록">
@@ -195,9 +195,9 @@ if (!msg.isEmpty()) {
     </table>
 
     <div style="margin-top:12px;">
-      <button type="submit" name="action" value="approved">선택 승인</button>
-      <button type="submit" name="action" value="rejected">선택 반려</button>
-      <button type="submit" name="action" value="approved_all" onclick="return confirm('전체 신청을 승인하시겠습니까?');">전체 승인</button>
+      <button type="submit" name="action" value="APPROVED">선택 승인</button>
+      <button type="submit" name="action" value="REJECTED">선택 반려</button>
+      <button type="submit" name="action" value="APPROVED_ALL" onclick="return confirm('전체 신청을 승인하시겠습니까?');">전체 승인</button>
     </div>
   </form>
 
@@ -235,40 +235,24 @@ if (!msg.isEmpty()) {
 
 <script>
 (function(){
-  const form = document.querySelector('form[action$="/admin/influencerBatchProcess.jsp"]');
-  form.addEventListener('submit', function(e){
-    const action = (e.submitter && e.submitter.name === 'action') ? e.submitter.value : null;
-    if (action !== 'approved') return;
+	form.addEventListener('submit', function(e){
+	    const action = (e.submitter && e.submitter.name === 'action') ? e.submitter.value : null;
+	    if (!action) return;
 
-    const checked = Array.from(form.querySelectorAll('input[name="selectedIds"]:checked'));
-    if (checked.length === 0) {
-      e.preventDefault();
-      alert('하나 이상 선택하세요.');
-      return;
-    }
-    if (checked.length === 1) {
-      e.preventDefault();
-      const requestId = checked[0].value; // ✅ id 값
-      if (!requestId) {
-        alert('신청 ID를 찾을 수 없습니다.');
-        return;
-      }
-      // ✅ id 기반으로 이동
-      const url = '<%= request.getContextPath() %>/admin/influencerApproveForm.jsp?id=' + encodeURIComponent(requestId);
-      window.location.href = url;
-    }
-    // 2건 이상이면 폼 제출 (일괄 처리)
-  });
+	    if (action === 'APPROVED_ALL') return; // 전체 승인은 그냥 제출
 
-  // 전체 선택 체크박스 기능
-  const selectAll = document.getElementById('selectAll');
-  if (selectAll) {
-    selectAll.addEventListener('change', function() {
-      const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
-      checkboxes.forEach(cb => cb.checked = this.checked);
-    });
-  }
-})();
+	    const checked = Array.from(form.querySelectorAll('input[name="selectedIds"]:checked'));
+	    if (checked.length === 0) {
+	        e.preventDefault();
+	        alert('하나 이상 선택하세요.');
+	        return;
+	    }
+
+	    // ✅ 1건이든 다건이든 그냥 batch로 제출
+	    if (!confirm(checked.length + '건을 ' + (action === 'APPROVED' ? '승인' : '반려') + '하시겠습니까?')) {
+	        e.preventDefault();
+	    }
+	});
 </script>
 
 </html>

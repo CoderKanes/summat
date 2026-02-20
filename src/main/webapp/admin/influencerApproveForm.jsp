@@ -58,8 +58,14 @@ try {
 
 // 신청 정보 조회 (선택 사항: 폼에 표시하려면)
 InfluencerRequestDAO dao = InfluencerRequestDAO.getInstance();
-List<InfluencerRequestDTO> list = dao.getRequeList(null, null, requestId, requestId);
-InfluencerRequestDTO dto = list.isEmpty() ? null : list.get(0);
+List<InfluencerRequestDTO> list = dao.getRequeList(null, null, 1, Integer.MAX_VALUE);
+InfluencerRequestDTO dto = null;
+for (InfluencerRequestDTO item : list) {
+    if (item.getId() == requestId) {
+        dto = item;
+        break;
+    }
+}
 
 if (dto == null) {
     out.println("<h3>해당 신청을 찾을 수 없습니다.</h3>");
@@ -84,7 +90,7 @@ if (dto == null) {
   <div class="container">
     <h3>단건 승인</h3>
 
-    <form method="post" action="<%= request.getContextPath() %>/admin/influencerApproveProcess.jsp">
+    <form method="post" action="<%= request.getContextPath() %>/admin/influencerApprovePro.jsp">
       <!-- ✅ id 전달 -->
       <input type="hidden" name="id" value="<%= requestId %>">
       
@@ -97,7 +103,7 @@ if (dto == null) {
       </label>
       
       <label>요청 등급
-        <input type="text" value="<%= dto.getRequested_grade() %>" readonly>
+        <input type="text" value="<%= dto.getRequested_grade() == 2 ? "인플루언서" : dto.getRequested_grade() %>" readonly>
       </label>
 
       <label>관리자 메모 (1000자 이하)

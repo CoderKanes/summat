@@ -1,4 +1,4 @@
-<%@page import="oracle.jdbc.spi.UsernameProvider"%>
+<%@page import="sm.data.AdminDAO"%>
 <%@page import="sm.data.MemberDAO"%>
 <%@page import="sm.data.MemberDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -203,6 +203,9 @@
 	dto = dao.getInfo(user_id);
 	String profile_image_url = dao.getImage(user_id);
 	
+	// ✅ AdminDAO로 grade 조회
+	AdminDAO adminDao = AdminDAO.getInstance();
+	int currentGrade = adminDao.getGradeByUserId(user_id);
 %>
 	<!-- 프로필 카드: avatar(사진)와 정보 영역을 수직 스택으로 정리 -->
 <div class="card row" style="align-items:flex-start; gap:24px;">
@@ -219,10 +222,17 @@
     <div class="card" id="upgrade-card" style="padding:10px 12px; max-width:360px;">
       <div style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; gap:8px; margin-top:6px;">
-          <a href="/summat/user/influencerUpgradeForm.jsp?user_id=<%=user_id %>" class="btn" style="display:inline-flex; align-items:center; gap:8px; padding:8px 10px; font-size:13px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" fill="#fff"/></svg>
-            인플루언서 신청
-          </a>
+          <% if (currentGrade != 2) { %>
+            <a href="/summat/user/influencerUpgradeForm.jsp?user_id=<%=user_id %>" class="btn" style="display:inline-flex; align-items:center; gap:8px; padding:8px 10px; font-size:13px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" fill="#fff"/></svg>
+              인플루언서 신청
+            </a>
+          <% } else { %>
+            <div class="btn" style="background:#ccc; cursor:default; display:inline-flex; align-items:center; gap:8px; padding:8px 10px; font-size:13px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" fill="#666"/></svg>
+              인플루언서 승인 완료
+            </div>
+          <% } %>
 
           <a href="/summat/user/reporterUpgradeForm.jsp" class="btn primary" style="display:inline-flex; align-items:center; gap:8px; padding:8px 10px; font-size:13px;">
             <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6zm2 4h14v8H5v-8z" fill="#fff"/></svg>
