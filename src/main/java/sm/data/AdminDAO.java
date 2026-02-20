@@ -235,6 +235,23 @@ public class AdminDAO {
 		
 		return list;
 	}//end
+	
+	public int getGradeByUserId(String userId) {
+	    int grade = -1;
+	    try {
+	        conn = OracleConnection.getConnection();
+	        String sql = "select grade from members where user_id = ?";
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, userId);
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) grade = rs.getInt("grade");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        OracleConnection.closeAll(conn, pstmt, rs);
+	    }
+	    return grade;
+	}
 
 	/*
 	//총 회원 수 
