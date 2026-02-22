@@ -109,23 +109,34 @@ imageInput.addEventListener("change", () => {
 // =========================
 // form submit 전에 contenteditable 내용 hidden input에 넣기
 // =========================
+let isSubmitted = false;
+
 function beforeSubmit() {
+	isSubmitted = true; // 폼 전송 시에는 경고창을 띄우지 않음
     document.getElementById('content').value = editor.innerHTML;
     return true;
 }
+
+//브라우저 이탈 방지 이벤트 등록
+window.addEventListener('beforeunload', function (e) {
+    // 폼 제출(수정완료) 중이 아닐 때만 경고창 작동
+    if (!isSubmitted) {
+        // 표준에 따라 returnValue 설정 (메시지는 브라우저 기본 문구가 출력됨)
+        e.preventDefault();
+        e.returnValue = ''; 
+    }
+});
 
 // =========================
 // 가게찾기
 // =========================
 // 버튼 이벤트 리스너 등록 (onclick 대신 JS에서 처리)
 if (findStoreBtn) {
-	alert("1");
+
 	findStoreBtn.addEventListener('click', () => {
     	window.openStoreSearchPopup();
-		alert("2");
+	
     });
-}else{
-	alert("3");
 }
 
 window.openStoreSearchPopup = function() {
@@ -173,7 +184,6 @@ window.selectStore = function(storeId, Menus) {
         .then(resultText => {
             console.log("서버 응답:", resultText);
             const displayEl = document.getElementById('resultDisplay');
-			alert("11");
             if (displayEl) {
                 displayEl.innerText = resultText;
             }

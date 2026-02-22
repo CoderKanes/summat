@@ -8,6 +8,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.stream.Collectors" %>
+<%@ page import="java.net.URLDecoder" %>
 
 <%--
     작성자 : 김용진
@@ -19,8 +20,13 @@
 
 
 <%	
-	PostQueryCondition QrCondition= new PostQueryCondition();	
+	PostQueryCondition QrCondition= new PostQueryCondition();
+	String encodeKeyword = request.getParameter("encodeKeyword");
 	String keyword = request.getParameter("keyword");
+	
+	if(encodeKeyword!=null){
+		keyword = URLDecoder.decode(encodeKeyword, "UTF-8");	
+	}
 	
 	if (keyword != null && !keyword.trim().isEmpty()) {
 		QrCondition.setKeyword(keyword);
@@ -73,12 +79,17 @@
   	String sid= (String)session.getAttribute("sid");
 	
 %>	
+<style>
+.container {
+	height: calc(100vh - 275px); /* header + nav + search */
+}
 
+</style>
 <!-- HTML -->
 <div class="container">
 	<main id="mainContent">
 <%
-	if(postList != null)
+	if(postList != null && postList.size()>0)
 	{
 		for(PostDTO dto : postList)
 		{		
@@ -87,7 +98,7 @@
 			<a href="/summat/post/postView.jsp?postNum=<%=dto.getPostNum()%>&pageNum=<%=currentPage%>"> 
 				<div class="postcard" onclick="location.href='postView.jsp?postNum=<%=dto.getPostNum()%>';">
 					<div class="postcard-imagebox">
-						<img class="postcard-image" src="<%=dto.getThumbnailImage()%>">
+						<img class="postcard-image" src="<%=dto.getThumbnailImage()%>"  onerror="this.style.display='none';">
 					</div>
 					<div class="postcard-textbox">
 						<h3><%=dto.getTitle()%></h3>
@@ -99,8 +110,12 @@
 			</a><br />
 <%			
 		}
-	}
-%>
+	}else{	%>
+	
+	<h3>검색 결과가 없습니다.</h3>
+	<%} %>
+
+
 	<% if(!(isAuth == null || sid==null || sid.isEmpty())){%>
 		<a href="/summat/post/postWrite.jsp"> 포스트 쓰기 </a>
 	<%} %>

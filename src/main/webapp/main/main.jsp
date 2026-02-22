@@ -6,6 +6,11 @@
     내용 : 메인페이지. 기본적인 진입방식으로 접근했을때 가장 처음 보여줄 페이지. 
     	  저장된 쿠키를 불러와 자동 로그인.
 --%>
+
+<%
+	//통합검색
+	String totalSearch = request.getParameter("totalSearch")!=null? request.getParameter("totalSearch") : null;
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -19,20 +24,35 @@
 
 	<div class="container">
 		<main id="mainContent">
-			<div class="filter">필터링 및 카테고리 숏컷</div>
-
-			<div class="cards">
-				<div class="card">추천</div>
-				<div class="card">인기</div>
-				<div class="card">이벤트</div>
-			</div>
-
-			<div class="banner">뭔가 뭔가 배너</div>
-
-			<!-- 리스트 -->
-			<h2>최신 포스트</h2>
-			<jsp:include page="/post/postList.jsp" />	 
-			<br />
+			<%if(totalSearch==null){ %>
+				<div class="filter">필터링 및 카테고리 숏컷</div>
+	
+				<div class="cards">
+					<div class="card">추천</div>
+					<div class="card">인기</div>
+					<div class="card">이벤트</div>
+				</div>
+	
+				<div class="banner">뭔가 뭔가 배너</div>
+	
+				<!-- 리스트 -->
+				<h2>최신 포스트</h2>
+				<jsp:include page="/post/postList.jsp" />	 
+				<br />
+			<%}else{ %>
+				<h2>음식정보 검색결과</h2>
+				<jsp:include page="/food/foodList.jsp" >
+					<jsp:param name="encodeKeyword" value='<%= java.net.URLEncoder.encode(totalSearch, "UTF-8") %>'/>					
+				</jsp:include>	 
+				<br />
+				
+				<h2>포스트 검색결과</h2>
+				<jsp:include page="/post/postList.jsp">
+					<jsp:param name="searchType" value="ALL"/>
+					<jsp:param name="encodeKeyword" value='<%= java.net.URLEncoder.encode(totalSearch, "UTF-8") %>'/>					
+				</jsp:include>	 
+				<br />
+			<%} %>
 		</main>
 	</div>
 

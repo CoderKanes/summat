@@ -14,6 +14,12 @@ public class MenuDTO {
     private String cCategory_str;
     private String fCategory_str;
     private String foodItem_str;
+    //without DB field
+    private String storeName; 
+    private int storeStatus;
+    private Double storeDistance;
+
+	
 
 	public int getId() {
 		return Id;
@@ -81,5 +87,22 @@ public class MenuDTO {
 	public void setFoodItem_str(String foodItem_str) {
 		this.foodItem_str = foodItem_str;
 	}
-
+	public String getStoreName() {
+		return storeName;
+	}
+	public void setStoreName(String storeName) {
+		this.storeName = storeName;
+	}
+	public int getStoreStatus() {
+		return storeStatus;
+	}
+	public void setStoreStatus(int storeStatus) {
+		this.storeStatus = storeStatus;
+	}
+	public Double getStoreDistance() {
+		return storeDistance;
+	}
+	public void setStoreDistance(Double storeDistance) {
+		this.storeDistance = storeDistance;
+	}
 }

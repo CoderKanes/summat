@@ -8,6 +8,7 @@
 <%@ page import="sm.data.MenuDTO" %>
 <%@ page import="sm.data.MenuGroupDTO" %>
 <%@ page import="sm.util.FoodCategoryUtil" %>
+<%@ page import="java.net.URLDecoder" %>
 
 <%
 	String editParam = request.getParameter("Edit");
@@ -17,11 +18,18 @@
 	}
 List<FoodCategoryUtil.GroupViewData> viewDatas = null;
 String menuData = request.getParameter("menuData");
+
+String encodeMenuData = request.getParameter("encodeMenuData");
+if(encodeMenuData!=null && menuData==null){
+	menuData = URLDecoder.decode(encodeMenuData, "UTF-8");	
+}
+
 if(menuData != null)
 {	
 	FoodCategoryUtil.MenuData data = FoodCategoryUtil.menuDataParse(menuData);	
 	viewDatas = data.GetGroupViewDatas();
 }
+
 
 if(viewDatas==null || viewDatas.size() == 0){
 	if(viewDatas==null)	{

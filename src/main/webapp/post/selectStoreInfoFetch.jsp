@@ -1,14 +1,24 @@
 <%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ page import="sm.data.StoreDAO, sm.data.StoreDTO, sm.data.MenuDAO, sm.data.MenuDTO" %>
 <%
-    int storeId = Integer.parseInt(request.getParameter("storeId"));
+    int storeId = -1;
+	
+	try {
+		storeId = Integer.parseInt(request.getParameter("storeId"));	   
+	} catch (NumberFormatException ex)
+	{
+	   
+	}
+	
+
+
     String menusParam = request.getParameter("menus"); 
     
     StringBuilder sb = new StringBuilder();
     
     // 가게 정보 조회
     StoreDAO sdao = new StoreDAO();
-    StoreDTO sdto = sdao.GetStoreInfo(storeId);
+    StoreDTO sdto = (storeId != -1)?sdao.GetStoreInfo(storeId) : null;
     if(sdto != null) {
         sb.append("방문하신 가게 : ").append(sdto.getName());
     }

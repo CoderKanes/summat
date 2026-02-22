@@ -70,31 +70,58 @@
 	if (isAuth == null) {
     	isAuth = false;
 	}
+	
+	//통합검색
+	String totalSearch = request.getParameter("totalSearch")!=null? request.getParameter("totalSearch") : null;
+	
+	//topbar option
+	boolean bShowLogo = request.getParameter("showLogo")!=null? Boolean.parseBoolean(request.getParameter("showLogo")) : true;
+	boolean bShowSearch = request.getParameter("showSearch")!=null? Boolean.parseBoolean(request.getParameter("showSearch")) : true;
+	boolean bShowRightButtons = request.getParameter("showRightBtns")!=null? Boolean.parseBoolean(request.getParameter("showRightBtns")) : true;
+	boolean bShowNaviMenu = request.getParameter("showNaviMenu")!=null? Boolean.parseBoolean(request.getParameter("showNaviMenu")) : true;
+
 %>
     
-<header> 
-	☰
-	<div class="search">검색바</div>
+<header class="header">
+ 	<div class="header-left">
+ 		<%if(bShowLogo){ %> 
+ 		<a style="width: 96px; height: 60px;" href="/summat/main/main.jsp">
+ 			<img style="width: 96px; height: 60px;" alt="" src="/summat/resources/image/summat.png">
+ 		</a>
+ 		<%} %>
+ 	</div>
+ 	
+ 	<%if(bShowSearch){ %> 
+	<form action="/summat/main/main.jsp" method="get" class="search" >		
+	    <input type="search" name="totalSearch" placeholder="통합검색" <%if(totalSearch!=null){%>value="<%=totalSearch%>"<%}%> />
+	    <button type="submit" class="search-btn" aria-label="검색">🔍</button>	   
+	</form>
+	 <%} %>
 
-
-	<!-- 로그인 여부에 따라 버튼 변경 -->
-	<% if (isAuth) { %>  
-		<% if (grade == 0) { %>  
-			<button class="theme-btn" onclick="location.href='/summat/admin/memberList.jsp'">회원 관리</button>  
-		<% } else if (grade == 1) { %>  
-			<button class="theme-btn" onclick="location.href='/summat/user/mypage.jsp'">마이페이지</button>  
-		<% } %>  
-		<button class="theme-btn" onclick="location.href='/summat/user/logoutPro.jsp'">로그아웃</button>  
-	<% } else { %>  
-		<button class="theme-btn" onclick="login()">로그인</button>  
-	<% } %> 
+	<div class="header-right">
+	<%if(bShowRightButtons){ %> 
+		<!-- 로그인 여부에 따라 버튼 변경 -->
+		<% if (isAuth) { %>  
+			<% if (grade == 0) { %>  
+				<button class="theme-btn" onclick="location.href='/summat/admin/memberList.jsp'">회원 관리</button>  
+			<% } else if (grade == 1) { %>  
+				<button class="theme-btn" onclick="location.href='/summat/user/mypage.jsp'">마이페이지</button>  
+			<% } %>  
+			<button class="theme-btn" onclick="location.href='/summat/user/logoutPro.jsp'">로그아웃</button>  
+		<% } else { %>  
+			<button class="theme-btn" onclick="login()">로그인</button>  
+		<% } %> 
+ 	<%} %>
+	</div>
 </header>
 <nav class="top-nav">
     <ul>
+    <%if(bShowNaviMenu){ %> 
         <li class="nav-item"><a href="/summat/main/main.jsp">홈</a></li>
         <li class="nav-item"><a href="/summat/food/foodMain.jsp">음식정보</a></li>
         <li class="nav-item"><a href="/summat/post/postMain.jsp">포스트</a></li>
         <li class="nav-item"><a href="/summat/board/list.jsp">커뮤니티</a></li>
+    <% } %> 
     </ul>
 </nav>
 

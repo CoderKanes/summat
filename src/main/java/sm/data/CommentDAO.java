@@ -12,7 +12,8 @@ public class CommentDAO {
 	public CommentDAO() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@192.168.219.198:1521:orcl", "Web1", "1234");
+			//conn = DriverManager.getConnection("jdbc:oracle:thin:@192.168.219.198:1521:orcl", "Web1", "1234");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@58.73.200.225:1521:orcl", "Web1", "1234");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -59,11 +59,12 @@ boolean isOwner = sid!=null && sid.equals(dto.getUser_id());
 
 <style>
 .post-view-wrap {
-	max-width: 900px;
-	margin: 40px auto;
+	max-width: 100%;
+	margin: 10px auto;
 }
 
 .post-view-card {
+	width: 95%;
 	padding: 32px;
 }
 
@@ -190,6 +191,8 @@ boolean isOwner = sid!=null && sid.equals(dto.getUser_id());
 </style>
 
 <body>
+	<jsp:include page="/main/topBar.jsp"></jsp:include>
+
 	<div class="post-view-wrap">
 
 		<%

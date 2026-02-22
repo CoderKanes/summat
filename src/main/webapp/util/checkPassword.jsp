@@ -28,11 +28,11 @@
 
 <style>
 .password-wrap {
-    min-height: 100vh;
+    height: calc(100vh - 123px);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f5f3ef;
+    background: #f5f3ef; 
 }
 
 .password-card {
@@ -42,6 +42,7 @@
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     text-align: center;
+    margin-top: -100px;
 }
 
 .password-card h2 {
@@ -92,6 +93,11 @@
 </head>
 
 <body>
+<jsp:include page="/main/topBar.jsp">
+	<jsp:param  name="showSearch" value="false"/>
+	<jsp:param  name="showRightBtns" value="false"/>
+	<jsp:param  name="showNaviMenu" value="false"/>
+</jsp:include>
 <div class="password-wrap">
     <div class="password-card">
         <h2>비밀번호 확인</h2>

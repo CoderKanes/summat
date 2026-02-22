@@ -16,6 +16,11 @@
 <link href="/summat/resources/css/style.css" rel="stylesheet" />
 <link href="/summat/resources/css/post/postEdit.css" rel="stylesheet" />
 
+<jsp:include page="/main/topBar.jsp">
+	<jsp:param  name="showSearch" value="false"/>
+	<jsp:param  name="showRightBtns" value="false"/>
+	<jsp:param  name="showNaviMenu" value="false"/>
+</jsp:include>
 
 <main class="post-edit-page">
 

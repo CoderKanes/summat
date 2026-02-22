@@ -10,6 +10,18 @@
 <%@ page import="sm.data.FoodCommentDAO"%>
 <%@ page import="java.util.*"%>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/> 
+
+
+<style>
+#map { 
+width:100%; 
+height:400px; 
+ margin:15px 0; }
+</style>
+
 <script>
 	 //1️ 댓글 삭제 함수
 function deleteComment(id, boardNum) {
@@ -21,6 +33,20 @@ function deleteComment(id, boardNum) {
     }
 }
 
+let map, marker;
+let lat, lon;
+function initMap(){
+	 if(map) return;
+	 map = L.map('map').setView([lat,lon],13);
+	 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+	}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+
+});
+
+		
 </script>
 
 
@@ -61,8 +87,22 @@ if(mdto!=null){
 	
 	가게메뉴
 		<jsp:include page="/store/Menu.jsp">
-			<jsp:param name="menuData" value="<%=menuDataString%>" />
+			<jsp:param name="encodeMenuData" value='<%= java.net.URLEncoder.encode(menuDataString, "UTF-8") %>' />
 		</jsp:include>
+		
+		<%if(sdto.getGeoCode()!=null){
+			String[] geolatlon = sdto.getGeoCode().split(",");
+			if(geolatlon.length==2){%>
+			<script>
+			lat = <%=geolatlon[0]%>;
+			lon = <%=geolatlon[1]%>
+			initMap();
+			</script>
+			<div id="map" style="border:1px solid #aaa; height:200px; margin-top:10px;">
+	        	지도 영역 (API 연결 전)
+	        </div>
+			
+		<%}} %>
 	<%}%>
 <h2>짧은 방문 후기</h2>
 

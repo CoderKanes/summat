@@ -68,33 +68,135 @@ function boarddelete(Num) {
 </script>
 
 
-<html>
+
 
 <!-- CSS 담당하는 기능으로 페이지 모양 스타일 색깔 저장해 놓은 부분을 가져 오는 태그   -->
 <link href="/summat/resources/css/style.css" style="text/css"
 	rel="stylesheet" />
+<style>
+/* 게시판 전용 추가 스타일 */
+.board-container {
+    max-width: 90%;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
+.board-table {
+	width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    /* 테이블 레이아웃을 고정하여 컬럼 너비를 강제합니다 */
+    table-layout: fixed;
+}
 
-<!-- 5️ 교실 이동 (HTML 시작)  -->
+.board-table th {
+    background-color: #f8f9fa;
+    color: #444;
+    padding: 15px;
+    border-bottom: 2px solid #eee;
+    font-weight: 600;
+}
 
-<head>
-<meta charset="UTF-8">
-<!-- HTML 인코딩 -->
-</head>
-<body>
+/* 각 컬럼의 너비를 비율로 지정 (총합 100%) */
+.board-table th:nth-child(1) { width: 60px; }  /* 번호 */
+.board-table th:nth-child(2) { width: auto; }  /* 제목 (남은 공간 모두 차지) */
+.board-table th:nth-child(3) { width: 100px; } /* 작성자 */
+.board-table th:nth-child(4) { width: 120px; } /* 날짜 */
+.board-table th:nth-child(5) { width: 70px; }  /* 조회수 */
+.board-table th:nth-child(6) { width: 60px; }  /* 댓글 */
+.board-table th:nth-child(7) { width: 80px; }  /* 관리 */
+
+.board-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    color: #555;
+    /* 내용이 넘칠 때를 대비한 설정 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.board-table tr:hover {
+    background-color: #fafafa;
+}
+
+.board-table .title-cell {
+	text-align: left;
+    /* 말줄임표 핵심 속성 */
+    white-space: nowrap;      /* 줄바꿈 방지 */
+    overflow: hidden;         /* 영역 밖 숨김 */
+    text-overflow: ellipsis;  /* ... 표시 */
+}
+
+.board-table .title-cell a {
+    display: block;           /* 클릭 영역 확장 및 정렬 유지 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.board-table a {
+    text-decoration: none;
+    color: var(--text);
+}
+
+.board-table a:hover {
+    color: var(--point);
+}
+
+/* 검색창 및 버튼 디자인 */
+.search-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-form input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+.pagination a {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    border-color: var(--point);
+    color: var(--point);
+}
+</style>
 
 	<jsp:include page="/main/topBar.jsp"></jsp:include>
-	<a href="main/main.jsp">●홈●</a>
-	<a href="list.jsp?">게시글 목록</a>
 	
-
+<div class="board-container">
+	
 	<!-- 2️ 검색 폼 영역 -->
-	<form method="get" action="list.jsp">
-		<input type="text" name="keyword" placeholder="검색어 입력"
-			value="<%=request.getParameter("keyword") != null ? request.getParameter("keyword") : ""%>">
-		<input type="submit" value="검색">
-	</form>
-
+	<div class="search-area">
+		<form method="get" action="list.jsp" class="search-form">
+			<input type="text" name="keyword" placeholder="검색어 입력"
+				value="<%=request.getParameter("keyword") != null ? request.getParameter("keyword") : ""%>">
+			<button type="submit" class="theme-btn">검색</button>
+		</form>
+	</div>
 
 
 	<!------3️ JSP 선언부 (전역 변수)---->
@@ -149,9 +251,8 @@ function boarddelete(Num) {
 	%>
 	<!--******************************************************************************************-->
 	<!-- -----4. 리스트 글 목록 --------->
-	<table border="1"
-		style="width: 100%; border-collapse: collapse; margin: auto;">
-
+	<table class="board-table">
+        <thead>
 		<tr height="30">
 			<th>번호</th>
 			<th>제목</th>
@@ -161,8 +262,9 @@ function boarddelete(Num) {
 			<th>댓글</th>
 			<th>삭제</th>
 		</tr>
-
+		</thead>
 		<!-- -----5. 리스트 글 목록 --------->
+		<tbody>
 		<%
 		if (list != null && !list.isEmpty()) {
 			CommentDAO cdao = new CommentDAO();
@@ -191,14 +293,18 @@ function boarddelete(Num) {
 		<%
 		}
 		%>
+		</tbody>
 	</table>
 	<!--******************************************************************************************-->
 
 	<!------글쓰기 버튼 영역---->
 	<br>
-	<input type="button" value="글쓰기" onclick="location.href='write.jsp'">
+	<div style="text-align: right; margin-top: 20px;">		
+        <button class="theme-btn" onclick="location.href='write.jsp'">글쓰기</button>
+    </div>
 
 	<!--페이지 총 글자수 계산 1페이지에서 보여줄 갯수 확인 만약에 카운트가 0보다 크면-->
+	<div class="pagination">
 	<%
 	// 만약에 카운트가 0보다 크면 
 	if (count > 0) {
@@ -225,6 +331,7 @@ function boarddelete(Num) {
 
 	<!-- 리스트페이지 이전 태그이동 시작페이지 -10 페이지리턴 ""  -->
 	<!--  여기 안에 시작페이지 기능 리턴페이지 기능 자바스크립트 추가 하기    -->
+	
 	<a href="list.jsp?pageNum=<%=startPage - 10%><%=pageReturn%>">[이전]</a>
 
 	<%
@@ -244,6 +351,7 @@ function boarddelete(Num) {
 	}
 	}
 	%>
-
-</body>
-</html>
+	</div>
+	
+	<button class="search-btn" onclick="location.href='list.jsp'">게시글 목록</button>  		
+</div>

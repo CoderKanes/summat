@@ -18,7 +18,8 @@ public class OracleConnection {
 			//1. 드라이버 로드
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			//2. 연결 (DB접속)		
-			String dburl = "jdbc:oracle:thin:@192.168.219.198:1521:orcl";
+			//String dburl = "jdbc:oracle:thin:@192.168.219.198:1521:orcl";
+			String dburl="jdbc:oracle:thin:@58.73.200.225:1521:orcl"; 
 			String user="web1";
 			String pw="1234";
 			connection = DriverManager.getConnection(dburl, user, pw);

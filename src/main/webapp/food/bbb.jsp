@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="sm.data.MenuCategoryDAO"%>
+<%@ page import="java.util.Map"%>
 
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -23,9 +25,9 @@ button {
 }
 
 .search-wrapper {
-  width: 80%;
-  margin: 0 auto;           /* 전체 가운데 정렬 */
-  box-sizing: border-box;
+  width: 95%;      /* 또는 80% 유지해도 됨 */
+  margin: 0;        /* 가운데 정렬 제거 */
+  padding: 0 20px;  /* 좌우 여백만 살짝 */
 }
 
 .search-mode {
@@ -54,7 +56,7 @@ select, input {
   gap: 8px;
 }
 
-.address-row input {
+.address-row input[type="text"] {
   min-width: 375px;
   padding: 6px;
 }
@@ -80,7 +82,7 @@ select, input {
 
 .action-btn {
  align-items: center;     /* 위아래 중앙 */
-  min-width: 75px;
+  width: 75px;
   padding: 6px 16px;
   background: #b36611;
   color: #fff;
@@ -90,16 +92,34 @@ select, input {
 }
 
 .action-btn:hover {
-  min-width: 75px;
+  width: 75px;
   background: #b39623;
+}
+.category-row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.category-row select {
+  flex: 1;
+  min-width: 120px;
 }
 
 #map { 
 width:100%; 
 height:400px; 
  margin:15px 0; }
-
 </style>
+
+<%
+	Map< String, Integer> cultureMap = MenuCategoryDAO.getInstance().getCultureCategoryReverseMap();
+	Map< String, Integer> foodtypeMap = MenuCategoryDAO.getInstance().getFoodTypeReverseMap();
+	Map< String, Integer> foodItemMap = MenuCategoryDAO.getInstance().getFoodItemReverseMap();
+	
+	
+%>
+
 <div class="search-wrapper">
 	<!-- 검색 모드 -->
 	<div class="search-mode">
@@ -112,54 +132,71 @@ height:400px;
 	
 	  <!-- 음식 검색 -->
 	  <div id="foodFilter">	
+	  	<form action="/summat/food/foodMain.jsp" method="get">
 		  <div class="filter-tabs">
-			  <button class="tab-btn active" onclick="switchFoodTab('keyword', this)">메뉴검색</button>
-			  <button class="tab-btn" onclick="switchFoodTab('category', this)">카테고리선택</button>
+			   <input type="button" class="tab-btn active" onclick="switchFoodTab('keyword', this)" value="메뉴검색">
+			   <input type="button" class="tab-btn" onclick="switchFoodTab('category', this)" value="카테고리선택">
 		  </div>
 		  <div class="tab-content">
 		
 			  <!-- 메뉴 검색 -->
 			  <div id="keywordTab">
-			    <input type="search" placeholder="음식 검색어">
-			    <button class="action-btn">검색</button>
+			    <input type="search" name="Keyword" placeholder="음식 검색어">
+			    <input type="submit"  class="action-btn" value="검색"></button>
 			  </div>
 			  <!-- 카테고리 선택 -->
 			  <div id="categoryTab" class="hidden">
-			    <select>
-			      <option>대분류</option>
+			  <div class="category-row"> 
+			    <select id="ccategorySelect" name="ccategory" onchange="FilteredFoodsbyCategory()">
+			      <option value=>분류1</option>
+			      <%for(String key:cultureMap.keySet()){ %>
+			       <option value="<%=key%>"><%=key%></option>			      
+			      <%} %>
 			    </select><br>
-			    <select>
-			      <option>중분류</option>
+			    <select id="fcategorySelect" name="fcategory" onchange="FilteredFoodsbyCategory()">
+			      <option value=>분류2</option>
+			      <%for(String key:foodtypeMap.keySet()){ %>
+			       <option value="<%=key%>"><%=key%></option>			      
+			      <%} %>
 			    </select><br>
-			    <select>
-			      <option>소분류</option>
+			    <select id="foodItemSelect" name="foodItem" >
+			      <option value=>상위 카테고리 먼저 선택</option>			     
 			    </select>
+			    
+			    <input type="submit"  class="action-btn" value="검색"></button>
+			    </div>
 			  </div>
 	   
 		  </div>
 	    <!-- 가격 -->
 	    <div>
-	      <input type="number" placeholder="최소가격"> ~
-	      <input type="number" placeholder="최대가격">
+	      <input type="number" name="minPrice" placeholder="최소가격"> ~
+	      <input type="number" name="maxPrice" placeholder="최대가격">
 	    </div>
+	    </form>
 	  </div>
 	
 	  <!-- 위치 검색 -->
 	  <div id="locationFilter" class="hidden">	
-	    <button id="btn_addressSearch" class="tab-btn active" onclick="switchLocationTab('address', this)">주소검색</button>
-	    <button id="btn_mapSearch" class="tab-btn" onclick="switchLocationTab('map', this)">지도검색</button>
+	    <input type="button" id="btn_addressSearch" class="tab-btn active" onclick="switchLocationTab('address', this)"  value="주소검색"></input>
+	    <input type="button" id="btn_mapSearch" class="tab-btn" onclick="switchLocationTab('map', this)" value="지도검색"></input>
 	
 	    <div id="addressSearch" class="address-row">
 	      <input id="my_address" type="text" placeholder="주소 입력" onchange="runGeocode(this.value)">
-	      <button class="action-btn" type="button" onclick="openPostcode()">주소찾기</button>	      
+	      <input type="button" class="action-btn" style="width=40px;" onclick="openPostcode()" value="주소찾기"></input>	      
 	    </div>
 	
 	    <div id="mapSearch" class="hidden">
 	      <div id="map" style="border:1px solid #aaa; height:200px; margin-top:10px;">
 	        지도 영역 (API 연결 전)
-	      </div>
-	    
+	      </div>	    
 	    </div>
+	    
+	    <form id="geoCodeform" action="/summat/food/foodMain.jsp" method="get">
+	    	<input type="hidden" id="location_Lat" name="location_Lat"/>
+	    	<input type="hidden" id="location_Lon" name="location_Lon"/>
+	    	<input type="submit" value="찾기" />
+	    </form>
 	  </div>
 	
 	</div>
@@ -229,6 +266,29 @@ const categories = {
   }
 };
 
+function FilteredFoodsbyCategory() {
+    const ccSelect = document.getElementById('ccategorySelect');
+    const fcSelect = document.getElementById('fcategorySelect');
+    const fiSelect = document.getElementById('foodItemSelect');    
+    
+   
+    const params = new URLSearchParams();
+    params.append('cc', ccSelect.value);
+    params.append('fc', fcSelect.value);
+
+    fetch('foodCategoryfetch.jsp', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString()
+    })
+    .then(response => response.text()) 
+    .then(data => {
+        fiSelect.innerHTML = data;
+    })
+    .catch(error => console.error('Error:', error));
+}
 
 
 function setActiveTab(button) {
@@ -281,14 +341,10 @@ async function runGeocode(address){
          if(data.length){
              const lat = parseFloat(data[0].lat);
              const lon = parseFloat(data[0].lon);
-			
-             const resultTxt = document.getElementById('resultTxt');
-             if (resultTxt) {
-               resultTxt.innerText =
-                 q + (q !== address ? ' (대략 위치)' : '') + ' 기준';
-             }
+         
              updateMap(lat,lon);
              calculateDistances(lat,lon);
+         
              return;
          }
      }catch(e){
@@ -318,10 +374,7 @@ async function reverseGeocode(lat, lon){
 const debouncedReverse = debounce(async (lat,lon)=>{
     const addr = await reverseGeocode(lat,lon);
     if(addr){
-    	if(resultTxt)
-    	{
-        	resultTxt.innerText = addr + ' 기준 (지도 선택)';
-    	}
+    	
     }
 }, 800);
 /* =========================
@@ -336,10 +389,17 @@ function initMap(){
      const lon = e.latlng.lng;
      updateMap(lat,lon);
      calculateDistances(lat,lon);
+     
+ 
+	 	 
      debouncedReverse(lat,lon);
  });
 }
 function updateMap(lat,lon){
+ alert("lat: ", lat);
+ document.getElementById("location_Lat").value = lat;
+ document.getElementById("location_Lon").value = lon;
+ alert("위도에 들어간 값: " + document.getElementById("location_Lat").value);
  if(!map){ initMap(); }
  map.setView([lat,lon],14);
  if(marker) map.removeLayer(marker);

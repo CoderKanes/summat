@@ -30,11 +30,11 @@ public class BoardDAO {
 	public BoardDAO() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@192.168.219.198:1521:orcl", "Web1", "1234");
+			//conn = DriverManager.getConnection("jdbc:oracle:thin:@192.168.219.198:1521:orcl", "Web1", "1234");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@58.73.200.225:1521:orcl", "Web1", "1234");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	// 1. 전체 게시글 목록 조회 (최신 글 순)  일단 호출 하는 곳 없음 

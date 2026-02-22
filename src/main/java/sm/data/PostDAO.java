@@ -225,7 +225,6 @@ public class PostDAO {
 	// paging 범위와, 검색 조건에 해당하는 Post들의 List를 반환하는 Method
 	public List<PostDTO> selectPostList(int start, int end, PostQueryCondition condition) {
 		List<PostDTO> result = null;
-
 		try {
 			conn = OracleConnection.getConnection();
 

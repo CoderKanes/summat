@@ -16,22 +16,63 @@ body {
 }
 
 /* ===== HEADER ===== */
-header {
-	height: 70px;
-	background: var(--header-bg);
-	color: white;
-	display: flex;
-	align-items: center;
-	padding: 0 20px;
-	gap: 16px;
+.header {
+  height: 70px;
+  background: var(--header-bg);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
 }
 
+/* 좌/중/우 영역 동일한 기준폭 */
+.header-left,
+.header-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  height: 100%;
+}
+
+.header-right {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 검색은 가운데 고정 */
 .search {
-	flex: 1;
-	background: white;
-	color: #333;
-	padding: 10px;
-	border-radius: 6px;
+  flex: 0 0 520px;
+  max-width: 560px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: white;
+  border-radius: 8px;
+  padding: 0 12px;
+  margin: 0;
+}
+
+.search input {
+  flex: 1;
+  height: 90%;
+  border: none;
+  outline: none;
+  font-size: 18px;
+}
+
+.search-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #777;
+}
+
+.search-btn:hover {
+  color: var(--point);
 }
 
 .icon-btn {
@@ -116,7 +157,7 @@ header {
 /* ===== LAYOUT ===== */
 .container {
 	display: block; /* flex 제거 */
-	height: calc(100vh - 120px); /* header + nav */
+	height: calc(100vh - 170px); /* header + nav */
 }
 
 aside {

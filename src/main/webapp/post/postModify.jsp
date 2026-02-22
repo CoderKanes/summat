@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<jsp:include page="/main/topBar.jsp">
+	<jsp:param  name="showSearch" value="false"/>
+	<jsp:param  name="showRightBtns" value="false"/>
+	<jsp:param  name="showNaviMenu" value="false"/>
+</jsp:include>
+
 <main class="post-edit-page">
     <div class="form-container">
 		<h1 class="page-title">포스트 수정</h1>			
