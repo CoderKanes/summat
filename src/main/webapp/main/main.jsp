@@ -41,7 +41,7 @@
 				<br />
 			<%}else{ %>
 				<h2>음식정보 검색결과</h2>
-				<jsp:include page="/food/foodList.jsp" >
+				<jsp:include page="/food/food_List.jsp" >
 					<jsp:param name="encodeKeyword" value='<%= java.net.URLEncoder.encode(totalSearch, "UTF-8") %>'/>					
 				</jsp:include>	 
 				<br />
