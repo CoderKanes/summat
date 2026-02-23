@@ -97,6 +97,28 @@ public class MenuDAO {
 
 		return result;
 	}
+	
+	public int getRandomMenuId() {
+		int result = 0;
+		try {
+			conn = OracleConnection.getConnection();
+			String sql = "SELECT Id FROM (SELECT * FROM menu ORDER BY DBMS_RANDOM.VALUE) WHERE ROWNUM = 1";
+			pstmt = conn.prepareStatement(sql);
+
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {				
+				result = rs.getInt("Id");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			OracleConnection.closeAll(conn, pstmt, rs);
+		}
+
+		return result;
+	}
 
 	public List<MenuDTO> getFoodInfos() {
 		List<MenuDTO> result = new ArrayList<MenuDTO>();
@@ -317,6 +339,7 @@ public class MenuDAO {
 					dto.setStoreId(rs.getInt("storeId"));
 					dto.setName(rs.getString("name"));
 					dto.setPrice(rs.getInt("price"));
+					dto.setImage(rs.getString("image"));
 					dto.setCCategory_str(rs.getString("CCATEGORY_STR"));
 					dto.setFCategory_str(rs.getString("FCATEGORY_STR"));
 					dto.setFoodItem_str(rs.getString("FOODITEM_STR"));

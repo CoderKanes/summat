@@ -20,9 +20,8 @@
 <%
 	
 %>
-
 	<jsp:include page="/main/topBar.jsp"></jsp:include>
-	<jsp:include page="/food/bbb.jsp"></jsp:include>
+	<jsp:include page="/food/foodFilter_v2.jsp"></jsp:include>
 	<jsp:include page="/food/food_List.jsp"></jsp:include>
 
 </body>

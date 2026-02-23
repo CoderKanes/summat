@@ -96,7 +96,7 @@ body {
 		private String Image;
 		
 		FoodVeiwData(int id, String n, String i){
-	this.id = id; name = n; Image = i;
+			this.id = id; name = n; Image = i;
 		};
 		int getId(){return id;}
 		String getImage(){return Image;}

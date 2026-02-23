@@ -19,8 +19,8 @@
 <style>
 .search-card {
 	width: 400px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
+    padding: 3px 30px;
+    margin-bottom: 3px;
     align-items: center;
 }
 
@@ -48,12 +48,35 @@
 }
 
 .search-form button {
-    background: var(--point);
-    color: #fff;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #444;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.search-btnn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd; 
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* hover */
+.search-btnn:hover {
+  background: var(--point);
+  color: #fff;
+  border-color: var(--point);
+}
+
+/* 클릭 시 */
+.search-btnn:active {
+  transform: translateY(1px);
 }
 
 </style>
@@ -69,7 +92,7 @@
 			<option>댓글</option>
 			</select> 
 			<input type="search" name="keyword" value="<%=keyword%>"/>
-			<input type="submit" value="doSearch" />
+			<input type="submit" value="검색" class="search-btnn" />
 	</form>
 </div>
 

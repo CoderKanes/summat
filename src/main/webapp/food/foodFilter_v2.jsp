@@ -396,10 +396,8 @@ function initMap(){
  });
 }
 function updateMap(lat,lon){
- alert("lat: ", lat);
  document.getElementById("location_Lat").value = lat;
  document.getElementById("location_Lon").value = lon;
- alert("위도에 들어간 값: " + document.getElementById("location_Lat").value);
  if(!map){ initMap(); }
  map.setView([lat,lon],14);
  if(marker) map.removeLayer(marker);
@@ -410,16 +408,7 @@ function updateMap(lat,lon){
    거리 계산
 ========================= */
 function calculateDistances(lat,lon){
-    const list = document.getElementById('result-list');
-    list.innerHTML='<h3>🍽 맛집</h3>';
-    restaurants
-        .map(r=>({...r, d:getDistance(lat,lon,r.lat,r.lon)}))
-        .sort((a,b)=>a.d-b.d)
-        .forEach(r=>{
-            const p=document.createElement('p');
-            p.innerText=`\${r.name} : \${r.d.toFixed(2)} km`;
-            list.appendChild(p);
-        });
+   
 }
 //하버사인
 function getDistance(a,b,c,d){
